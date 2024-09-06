@@ -22,7 +22,7 @@
       <img src="images/logo.png" alt="" />
     </div>
 
-    <span class="logo_name">CodingLab</span>
+    <span class="logo_name">ISOM5260</span>
   </div>
 
   <div class="menu-items">
@@ -31,34 +31,27 @@
         <i class="uil uil-estate"></i>
         <span class="link-name">Dahsboard</span>
       </a></li>
-      <li><a href="#">
+      <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
         <i class="uil uil-files-landscapes"></i>
-        <span class="link-name">Content</span>
-      </a></li>
-      <li><a href="#">
-        <i class="uil uil-chart"></i>
-        <span class="link-name">Analytics</span>
-      </a></li>
-      <li><a href="#">
-        <i class="uil uil-thumbs-up"></i>
-        <span class="link-name">Like</span>
-      </a></li>
-      <li><a href="#">
-        <i class="uil uil-comments"></i>
-        <span class="link-name">Comment</span>
-      </a></li>
-      <li><a href="#">
-        <i class="uil uil-share"></i>
-        <span class="link-name">Share</span>
-      </a></li>
+        <span class="link-name">Print Report</span>
+        </a>
+      </li>
     </ul>
 
     <ul class="logout-mode">
       <li><a href="#">
-        <i class="uil uil-signout"></i>
-        <span class="link-name">Logout</span>
+        <i class="uil uil-user"></i>
+        <span class="link-name" th:text="${user}"></span>
       </a></li>
-
+      <li>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <i class="uil uil-signout"></i>
+          <span class="link-name">Sign Out</span>
+        </a>
+        <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+          <input type="hidden" name="_method" value="post" />
+        </form>
+      </li>
       <li class="mode">
         <a href="#">
           <i class="uil uil-moon"></i>
@@ -76,12 +69,6 @@
 <section class="dashboard">
   <div class="top">
     <i class="uil uil-bars sidebar-toggle"></i>
-
-    <div class="search-box">
-      <i class="uil uil-search"></i>
-      <input type="text" placeholder="Search here..." />
-    </div>
-
   </div>
 
   <div class="dash-content">
@@ -146,6 +133,26 @@
         { "data": "id"},
       ]
     });
+
+    const userData = {
+      username: '123',
+      password: '1234'
+    };
+
+      $('#generateReportBtn').on('click', function(event) {
+        event.preventDefault();
+        $.ajax({
+          url: '/triggerReport',
+          type: 'GET',
+          contentType: 'application/json',
+          success: function(response) {
+            alert('Report triggered successfully: ' + response.message);
+          },
+          error: function(xhr) {
+            alert('Error triggering report: ' + xhr.statusText );
+          }
+        });
+      });
 
     $('#registrationForm').on('submit', function(event) {
       event.preventDefault();

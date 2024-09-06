@@ -27,7 +27,6 @@ public class GreetingController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody USTStudent USTStudent) {
-        //userMapper.insertUser(user);
         return ResponseEntity.ok("User registered successfully");
     }
 

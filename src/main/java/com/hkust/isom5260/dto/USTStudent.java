@@ -1,7 +1,9 @@
 package com.hkust.isom5260.dto;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class USTStudent {
 
@@ -14,27 +16,6 @@ public class USTStudent {
     private String firstName;
 
     private String lastName;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
 
 
 }

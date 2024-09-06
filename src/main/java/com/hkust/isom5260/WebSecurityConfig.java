@@ -1,18 +1,30 @@
 package com.hkust.isom5260;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.hkust.isom5260.service.CustomUserDetailsService;
+import com.hkust.isom5260.service.USTStudentDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -22,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return new CustomUserDetailsService();
+		return new USTStudentDetailService();
 	}
 
 	@Bean
@@ -50,10 +62,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/users").authenticated()
 			.anyRequest().permitAll()
 			.and()
-			.formLogin().usernameParameter("email").defaultSuccessUrl("/users").permitAll()
+			.formLogin().loginPage("/login").usernameParameter("email").defaultSuccessUrl("/users")
+			.failureHandler(authenticationFailureHandler()).permitAll()
 			.and()
 			.logout().logoutSuccessUrl("/").permitAll();
 	}
-	
+
+	public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+		@Override
+		public void onAuthenticationFailure(
+				HttpServletRequest request,
+				HttpServletResponse response,
+				AuthenticationException exception)
+				throws IOException, ServletException {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			Map<String, Object> data = new HashMap<>();
+			data.put("timestamp", Calendar.getInstance().getTime());
+			data.put("exception", exception.getMessage());
+			this.getRedirectStrategy().sendRedirect(request,response,"/login?error=" + HttpStatus.UNAUTHORIZED.value());
+		}
+	}
+
+	@Bean
+	public AuthenticationFailureHandler authenticationFailureHandler() {
+		return new CustomAuthenticationFailureHandler();
+	}
 	
 }
