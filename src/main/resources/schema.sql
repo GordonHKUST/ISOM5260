@@ -28,5 +28,5 @@
 --);
 --CREATE SEQUENCE uststd_seq START WITH 1 INCREMENT BY 1;
 
-
-TRUNCATE TABLE car;
+select * from car;
+-- TRUNCATE TABLE car;

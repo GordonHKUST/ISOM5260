@@ -9,19 +9,19 @@
 <body>
 <div class="wrapper">
   <form name="f" action="login" method="POST">
+    <h4>HKUST ISOM Public Soccer Sign Up System(PSSUS)</h4>
     <h2>Login</h2>
     <div th:if="${error}" th:text="${error}">
 
     </div>
     <div class="input-field">
-      <input id="email" name="email" type="text" />
+      <input id="email" name="email" type="text" required="true"/>
       <label>Enter your email</label>
     </div>
     <div class="input-field">
-      <input id="password" name="password" type="password" />
+      <input id="password" name="password" type="password" required="true"/>
       <label>Enter your password</label>
     </div>
-    <input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}" />
     <button name="submit" type="submit" value="Login">Log In</button>
     <div class="register">
       <p>Don't have an account? <a href="/register">Register</a></p>

@@ -15,10 +15,14 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"/>
 
-    <title>ISOM Activty Sign up Page</title>
+    <title>Activity Register Page</title>
 </head>
 
 <style>
+#map {
+  height: 500px;
+  width: 100%;
+}
 html, body {
 min-height: 100%;
 }
@@ -53,27 +57,7 @@ width: 100%;
 padding: 20px;
 border-radius: 6px;
 background: #fff;
-box-shadow: 0 0 30px 0 #095484;
-}
-.banner {
-position: relative;
-height: 180px;
-background-image: url("/uploads/media/default/0001/01/9e07ce3a601795a5ac09a66a0c1fc8978e0ee51a.jpeg");
-background-size: cover;
-display: flex;
-justify-content: center;
-align-items: center;
-text-align: center;
-}
-.banner::after {
-content: "";
-background-color: rgba(0, 0, 0, 0.4);
-position: absolute;
-width: 100%;
-height: 100%;
-}
-p.top-info {
-margin: 10px 0;
+box-shadow: 0 0 5px 0 #095484;
 }
 input, select {
 margin-bottom: 10px;
@@ -143,6 +127,22 @@ width: calc(50% - 20px);
 width: calc(50% - 8px);
 }
 }
+.search-header {
+    background-color: #007bff;
+    color: white;
+    padding: 5px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+#activityForm{
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
 </style>
 <body>
 <nav>
@@ -151,187 +151,148 @@ width: calc(50% - 8px);
             <img src="images/logo.png" alt="" />
         </div>
 
-        <span class="logo_name">CodingLab</span>
+        <span class="logo_name">HKUST ISOM PSSUS</span>
     </div>
 
     <div class="menu-items">
         <ul class="nav-links">
             <li><a href="#">
                 <i class="uil uil-estate"></i>
-                <span class="link-name">Dahsboard</span>
+                <span class="link-name">Dashboard</span>
             </a></li>
-            <li><a href="#">
+            <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
                 <i class="uil uil-files-landscapes"></i>
-                <span class="link-name">Content</span>
-            </a></li>
-            <li><a href="#">
-                <i class="uil uil-chart"></i>
-                <span class="link-name">Analytics</span>
-            </a></li>
-            <li><a href="#">
-                <i class="uil uil-thumbs-up"></i>
-                <span class="link-name">Like</span>
-            </a></li>
-            <li><a href="#">
-                <i class="uil uil-comments"></i>
-                <span class="link-name">Comment</span>
-            </a></li>
-            <li><a href="#">
-                <i class="uil uil-share"></i>
-                <span class="link-name">Share</span>
-            </a></li>
+                <span class="link-name">Print Report</span>
+            </a>
+            </li>
         </ul>
 
         <ul class="logout-mode">
             <li><a href="#">
-                <i class="uil uil-signout"></i>
-                <span class="link-name">Logout</span>
+                <i class="uil uil-user"></i>
+                <span class="link-name" th:text="${user}"></span>
             </a></li>
-
-            <li class="mode">
-                <a href="#">
-                    <i class="uil uil-moon"></i>
-                    <span class="link-name">Dark Mode</span>
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">Sign Out</span>
                 </a>
-
-                <div class="mode-toggle">
-                    <span class="switch"></span>
-                </div>
+                <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+                    <input type="hidden" name="_method" value="post" />
+                </form>
             </li>
         </ul>
     </div>
 </nav>
+</nav>
 
 <section class="dashboard">
-    <div class="top">
-        <i class="uil uil-bars sidebar-toggle"></i>
-
-        <div class="search-box">
-            <i class="uil uil-search"></i>
-            <input type="text" placeholder="Search here..." />
-        </div>
-
-    </div>
-
     <div class="dash-content">
+        <div class="search-header">
+            <h5 class="mb-0" style="margin-left: 7px;">Booking Detail</h5>
+        </div>
+        <form id="activityForm" name="activityForm" action="actReg" method="POST">
         <div class="item">
             <p>Name<span >*</span></p>
             <div class="name-item">
-                <input type="text" name="name" placeholder="First" />
-                <input type="text" name="name" placeholder="Last" />
-            </div>
-        </div>
-        <div class="question">
-            <p>Gender<span >*</span></p>
-            <div class="question-answer">
-                <label><input type="radio" value="none" name="gender" /> <span>Male</span></label>
-                <label><input type="radio" value="none" name="gender" /> <span>Female</span></label>
+                <input type="text" id="firstName" name="name" th:value="${student.firstName}" placeholder="First" disabled/>
+                <input type="text" id="lastName" name="name" th:value="${student.lastName}" placeholder="Last" disabled/>
             </div>
         </div>
         <div class="item">
-            <p>Your current weight (lbs)<span >*</span></p>
-            <input type="text" name="name"/>
+            <p>Student ID<span>*</span></p>
+            <input id="studentId" type="text" name="name" required/>
         </div>
         <div class="item">
-            <p>Desired weight (lbs)<span >*</span></p>
-            <input type="text" name="name" />
+            <p>Number of person will join<span >*</span></p>
+            <input id="joinPerson" type="text" name="name" required />
         </div>
-        <div class="item">
-            <p>Height<span >*</span></p>
-            <input type="text" name="name" />
-        </div>
-        <div class="item">
-            <p>BMI<span >*</span></p>
-            <input type="text" name="name" />
-        </div>
-        <div class="item">
-            <p>Home Address<span >*</span></p>
-            <input type="text" name="name" placeholder="Street address" />
-            <div class="city-item">
-                <input type="text" name="name" placeholder="City" />
-                <input type="text" name="name" placeholder="Region" />
-                <input type="text" name="name" placeholder="Postal / Zip code" />
-                <select>
-                    <option value="">Country</option>
-                    <option value="1">Russia</option>
-                    <option value="2">Germany</option>
-                    <option value="3">France</option>
-                    <option value="4">Armenia</option>
-                    <option value="5">USA</option>
-                </select>
-            </div>
-        </div>
-        <div class="item">
+            <div class="item">
             <p>Email<span >*</span></p>
-            <input type="text" name="name" />
+            <input id="email" type="text" th:value="${student.email}" disabled/>
+            </div>
+            <div class="item">
+            <p>Phone<span >*</span></p>
+            <input id="phone" type="text" name="name" required/>
+        </div>
+            <div class="item">
+             <p>Booking Time Slot</p>
+                <div class="name-item">
+                    <input type="text" id="startTime" th:value="${schedules.session_start_time}" placeholder="Start Time" disabled />
+                    to
+                    <input type="text" id="endTime" th:value="${schedules.session_end_time}" placeholder="End Time" disabled />
+                </div>
+            </div>
+        <div class="item">
+            <p>Remarks</p>
+            <input id="remark" type="text" name="name" />
         </div>
         <div class="item">
-            <p>Phone</p>
-            <input type="text" name="name"/>
-        </div>
-        <div class="question">
-            <p>Do you require a personal trainer?<span >*</span></p>
-            <div class="question-answer">
-                <label><input type="radio" value="none" name="personal-trainer" /> <span>Yes</span></label>
-                <label><input type="radio" value="none" name="personal-trainer" /> <span>No</span></label>
+            <p>Booking Venue</p>
+            <div class="city-item">
+                <input type="text" id="addrLn1" th:value="${schedules.venue_address_en}" placeholder="English Address" disabled />
+                <input type="text" id="addrLn2" th:value="${schedules.venue_address_tc}" placeholder="Chinese Address" disabled />
+                <input type="text" id="addrLn3" th:value="${schedules.facility_location_name_en} + ' ' + ${schedules.facility_location_name_tc}" placeholder="loc" disabled/>
             </div>
+            <div class="item">
+           <div id="map"></div>
+        </div>
         </div>
         <div class="question">
-            <p>Have you been in a Gym before?<span >*</span></p>
+            <p>Do you require a trainer? (Sport Consultant from HKUST, free for charge)</p>
             <div class="question-answer">
-                <label><input type="radio" value="none" name="gym-before" /> <span>Yes</span></label>
-                <label><input type="radio" value="none" name="gym-before" /> <span>No</span></label>
-            </div>
-        </div>
-        <div class="question">
-            <p>Membership Type<span >*</span></p>
-            <div class="question-answer">
-                <label><input type="radio" value="none" name="membership" /> <span>Regular</span></label>
-                <label><input type="radio" value="none" name="membership" /> <span>Pro</span></label>
-                <label><input type="radio" value="none" name="membership" /> <span>VIP</span></label>
+                <label><input type="radio" value="Y" name="personalTrainer"/><span>Yes</span></label>
+                <label><input type="radio" value="N" name="personalTrainer"/><span>No</span></label>
             </div>
         </div>
         <div class="btn-block">
-            <button type="submit" href="/">Apply</button>
+            <button type="submit" >Apply</button>
         </div>
-
-
-
-
-
+        </form>
     </div>
 </section>
+</body>
 
-<script>
-    $(document).ready(function() {
 
-        var table = $('#todotable').DataTable({
-            "sAjaxSource": "/gettodos",
-            "sAjaxDataProp": "",
-            "order": [[ 0, "asc" ]],
-            "columns": [
-                { "data": "make"},
-                { "data": "model"},
-                { "data": "year"},
-                { "data": "id"},
-            ]
+<script th:inline="javascript">
+    function initMap() {
+        const latitude = parseFloat([[${schedules.venue_latitude}]]);
+        const longitude = parseFloat([[${schedules.venue_longitude}]]);
+        const coordinates = { lat: latitude, lng: longitude };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 16,
+            center: coordinates,
         });
+        const marker = new google.maps.Marker({
+            position: coordinates,
+            map: map,
+            title: "Venue Location",
+        });
+    }
+    window.onload = initMap;
 
-        $('#registrationForm').on('submit', function(event) {
+    $(document).ready(function() {
+        $('#activityForm').on('submit', function(event) {
             event.preventDefault();
-            const userData = {
-                username: $('#username').val(),
-                password: $('#password').val()
+            const activityForm = {
+                firstName: $('#firstName').val(),
+                lastName: $('#lastName').val(),
+                studentId: $('#studentId').val(),
+                joinPerson : $('#joinPerson').val(),
+                email :$('#email').val(),
+                phone :$('#phone').val(),
+                personalTrainer: $('input[name="personalTrainer"]:checked').val(),
+                startTime: $('#startTime').val(),
+                endTime : $('#endTime').val()
             };
-            console.log(JSON.stringify(userData));
+            console.log(JSON.stringify(activityForm));
             $.ajax({
                 type: 'POST',
-                url: '/register',
+                url: '/actReg',
                 contentType: 'application/json',
-                data: JSON.stringify(userData),
+                data: JSON.stringify(activityForm),
                 success: function(response) {
                     $('#message').text(response);
-                    $('#registrationForm')[0].reset();
                 },
                 error: function() {
                     $('#message').text('Registration failed');
@@ -340,7 +301,6 @@ width: calc(50% - 8px);
         });
     });
 </script>
-
 <script src="script.js"></script>
-</body>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnbMnePbkia7Uu2PeRoHf9V3gHKqmKYks"></script>
 </html>

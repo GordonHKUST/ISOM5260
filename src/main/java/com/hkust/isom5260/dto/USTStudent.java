@@ -17,5 +17,7 @@ public class USTStudent {
 
     private String lastName;
 
+    private String phone;
+
 
 }

@@ -1,24 +1,45 @@
 package com.hkust.isom5260.cron;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.hkust.isom5260.dto.LCSDActivity;
+import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
+import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SyncLCSDSoccerPitchCronJob {
-    //Https://www.smartplay.lcsd.gov.hk/rest/cms/api/v1/publ/contents/open-data/turf-soccer-pitch/file
+
+    @Autowired
+    private LCSDSoccerPitchScheduleMapper soccerPitchScheduleMapper;
+
+    private static Properties properties = new Properties();
+
+    public SyncLCSDSoccerPitchCronJob() {
+        String propertiesFilePath = "src/main/resources/application.properties";
+        try (InputStream input = Files.newInputStream(Paths.get(propertiesFilePath))) {
+            properties.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Scheduled(cron = "* * 1 * * ?")
     protected void executeInternal() throws JobExecutionException {
         System.out.println("Job executed at: " + System.currentTimeMillis());
-        String urlString = "https://www.smartplay.lcsd.gov.hk/rest/cms/api/v1/publ/contents/open-data/turf-soccer-pitch/file";
+        String urlString = properties.getProperty("lcsd.soccer.pitch.api.url");
         StringBuilder jsonBuilder = new StringBuilder();
         try {
             URL url = new URL(urlString);
@@ -35,9 +56,13 @@ public class SyncLCSDSoccerPitchCronJob {
             e.printStackTrace();
         }
         Gson gson = new Gson();
-        List<LCSDActivity> programs = gson.fromJson(jsonBuilder.toString(), new TypeToken<List<LCSDActivity>>(){}.getType());
-        for (LCSDActivity program : programs) {
-            System.out.println(program);
+        List<LCSDSoccerPitchSchedule> soccerPitches = gson.fromJson(jsonBuilder.toString(), new TypeToken<List<LCSDSoccerPitchSchedule>>(){}.getType());
+        for(LCSDSoccerPitchSchedule soccerPitch : soccerPitches) {
+            if(soccerPitchScheduleMapper.checkVenueExists(soccerPitch) > 0) {
+                soccerPitchScheduleMapper.updateVenueAvaliableCount(soccerPitch);
+            } else {
+                soccerPitchScheduleMapper.insert(soccerPitch);
+            }
         }
     }
 }

@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="style.css"/>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link type="text/css" rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/searchpanes/2.3.2/css/searchPanes.dataTables.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/select/2.1.0/css/select.dataTables.css}" />
   <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css}" />
   <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
@@ -22,22 +24,25 @@
       <img src="images/logo.png" alt="" />
     </div>
 
-    <span class="logo_name">ISOM5260</span>
+    <span class="logo_name">HKUST ISOM PSSUS</span>
   </div>
 
   <div class="menu-items">
     <ul class="nav-links">
-      <li><a href="#">
+      <li><a href="/users">
         <i class="uil uil-estate"></i>
-        <span class="link-name">Dahsboard</span>
+        <span class="link-name">Dashboard</span>
+      </a></li>
+      <li><a href="/searchPanel">
+        <i class="uil uil-estate"></i>
+        <span class="link-name">Find Soccer Pitch</span>
       </a></li>
       <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
         <i class="uil uil-files-landscapes"></i>
         <span class="link-name">Print Report</span>
-        </a>
+      </a>
       </li>
     </ul>
-
     <ul class="logout-mode">
       <li><a href="#">
         <i class="uil uil-user"></i>
@@ -51,16 +56,6 @@
         <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
           <input type="hidden" name="_method" value="post" />
         </form>
-      </li>
-      <li class="mode">
-        <a href="#">
-          <i class="uil uil-moon"></i>
-          <span class="link-name">Dark Mode</span>
-        </a>
-
-        <div class="mode-toggle">
-          <span class="switch"></span>
-        </div>
       </li>
     </ul>
   </div>
@@ -81,17 +76,17 @@
       <div class="boxes">
         <div class="box box1">
           <i class="uil uil-thumbs-up"></i>
-          <span class="text">Total Likes</span>
-          <span class="number">50,120</span>
+          <span class="text">Quota</span>
+          <span class="number">$</span>
         </div>
         <div class="box box2">
           <i class="uil uil-comments"></i>
-          <span class="text">Comments</span>
+          <span class="text">Total event join/establish</span>
           <span class="number">20,120</span>
         </div>
         <div class="box box3">
           <i class="uil uil-share"></i>
-          <span class="text">Total Share</span>
+          <span class="text">Avaliable Court</span>
           <span class="number">10,120</span>
         </div>
       </div>
@@ -100,17 +95,37 @@
     <div class="activity">
       <div class="title">
         <i class="uil uil-clock-three"></i>
-        <span class="text">Recent Activity</span>
+        <span class="text">My Recent Booking</span>
+      </div>
+    </div>
+    <div class="activity-data">
+      <table id="avaliableCourt2" class="table table-striped">
+        <thead>
+        <tr>
+          <th>Register?</th>
+          <th>Sayonana</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="title">
+        <i class="uil uil-clock-three"></i>
+        <span class="text">Quick View for Available Court</span>
       </div>
     </div>
       <div class="activity-data">
-        <table id="todotable" class="table table-striped">
+        <table id="avaliableCourt" class="table table-striped">
           <thead>
           <tr>
-            <th>make</th>
-            <th>model</th>
-            <th>year</th>
-            <th>id</th>
+            <th>Register?</th>
+            <th>Venue Name</th>
+            <th>Facility Name</th>
+            <th>Available Date</th>
+            <th>Session Start Time</th>
+            <th>Session End Time</th>
+            <th>Avaliable Court</th>
           </tr>
           </thead>
         </table>
@@ -122,22 +137,35 @@
 <script>
   $(document).ready(function() {
 
-    var table = $('#todotable').DataTable({
-      "sAjaxSource": "/gettodos",
+    $('#avaliableCourt').DataTable({
+      "sAjaxSource": "/getRecentAvaSch",
       "sAjaxDataProp": "",
       "order": [[ 0, "asc" ]],
       "columns": [
-        { "data": "make"},
-        { "data": "model"},
-        { "data": "year"},
         { "data": "id"},
-      ]
+        { "data": "venue_name_en"},
+        { "data": "facility_type_name_en"},
+        { "data": "available_date"},
+        { "data": "session_start_time"},
+        { "data": "session_end_time"},
+        { "data": "available_courts"}
+      ],
+      "columnDefs": [
+        {
+          "targets": 0,
+          "render": function(data, type, row) {
+            return `<a href="/activityDetail?id=${data}">Click</a>`;
+          }
+        }
+      ],
+      layout: {
+        top1: {
+          searchPanes: {
+            viewTotal: true
+          }
+        }
+      }
     });
-
-    const userData = {
-      username: '123',
-      password: '1234'
-    };
 
       $('#generateReportBtn').on('click', function(event) {
         event.preventDefault();
@@ -154,27 +182,6 @@
         });
       });
 
-    $('#registrationForm').on('submit', function(event) {
-      event.preventDefault();
-      const userData = {
-        username: $('#username').val(),
-        password: $('#password').val()
-      };
-      console.log(JSON.stringify(userData));
-      $.ajax({
-        type: 'POST',
-        url: '/register',
-        contentType: 'application/json',
-        data: JSON.stringify(userData),
-        success: function(response) {
-          $('#message').text(response);
-          $('#registrationForm')[0].reset();
-        },
-        error: function() {
-          $('#message').text('Registration failed');
-        }
-      });
-    });
   });
 </script>
 

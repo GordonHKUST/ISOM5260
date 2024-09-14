@@ -42,7 +42,11 @@ form {
 }
 
 h2 {
-  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+h4 {
   margin-bottom: 20px;
   color: #fff;
 }
