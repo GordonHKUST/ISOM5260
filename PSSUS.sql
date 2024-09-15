@@ -1,8 +1,5 @@
 --------------------------------------------------------
---  File created - Wednesday-September-11-2024
---------------------------------------------------------
---------------------------------------------------------
---  DDL for Table USTSTUDENT
+--  PSSUS SQL
 --------------------------------------------------------
 
 CREATE TABLE "USTSTUDENT"
@@ -11,13 +8,8 @@ CREATE TABLE "USTSTUDENT"
      "PASSWORD" VARCHAR2(2000 BYTE),
      "FIRSTNAME" VARCHAR2(255 BYTE),
      "LASTNAME" VARCHAR2(255 BYTE)
-) SEGMENT CREATION IMMEDIATE
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255
- NOCOMPRESS LOGGING
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
-  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
-REM INSERTING into ISOM5260.USTSTUDENT
+);
+
 SET DEFINE OFF;
 Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (41,'teas121@gmail.com','$2a$10$W6orrnjpSosU3bijKG1kjOlGb8D72PyJTEpnhE2QRMUe5L68t/nhS','get','er');
 Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (1,'sd@gmail.com','$2a$10$axCtIfUFNm4cneDfcAto3eL2M.FkswoV9jAWUAGOLvSWRAjcCgBZi','12','12');
@@ -25,18 +17,12 @@ Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (2,'test@te
 Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (23,'test1@test.com','$2a$10$muAAp2m3v9sxP3H9g4KvSuwvaQVfeFSM0dNgES/DA91abC/vFpQTO','test','test');
 Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (43,'test@test2.com','$2a$10$Ue0PI89B5ITG8mQTf35x9Ogvk3vSBZVGn.CNu6WoMzr0i8Pqab8I.','1a','1a');
 Insert into USTSTUDENT (ID,EMAIL,PASSWORD,FIRSTNAME,LASTNAME) values (42,'test@test.com111','$2a$10$JY6rJ8VXj70pVrNm9bKHCuLmnUV2eKRNVIN5yCvl4psECMBK5OV5G','11','1');
---------------------------------------------------------
---  DDL for Index USER_PK
---------------------------------------------------------
 
 CREATE UNIQUE INDEX "USER_PK" ON "USTSTUDENT" ("ID")
     PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
   BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
---------------------------------------------------------
---  Constraints for Table USTSTUDENT
---------------------------------------------------------
 
 ALTER TABLE "USTSTUDENT" MODIFY ("ID" NOT NULL ENABLE);
 ALTER TABLE "USTSTUDENT" MODIFY ("EMAIL" NOT NULL ENABLE);
@@ -48,8 +34,6 @@ ALTER TABLE "USTSTUDENT" ADD CONSTRAINT "USER_PK" PRIMARY KEY ("ID")
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
   BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT);
-
-
 
 CREATE TABLE LCSD_SOCCER_PITCH_SCHEDULE (
     ID INTEGER,
@@ -70,7 +54,8 @@ CREATE TABLE LCSD_SOCCER_PITCH_SCHEDULE (
     SESSION_START_TIME VARCHAR2(20 BYTE),
     SESSION_END_TIME VARCHAR2(20 BYTE),
     AVAILABLE_COURTS INTEGER,
-    PRIMARY KEY (ID , SESSION_START_TIME, FACILITY_LOCATION_NAME_EN, SESSION_END_TIME)
+    STATUS_CODE VARCHAR2(20 BYTE),
+    PRIMARY KEY (ID)
     );
 
 CREATE SEQUENCE schedule_seq
@@ -116,5 +101,21 @@ INSERT INTO LCSD_DISTRICT (district_id, district_name_en, district_name_tc, dist
 INSERT INTO LCSD_DISTRICT (district_id, district_name_en, district_name_tc, district_shortform) VALUES (17, 'Southern', '南區', 'South');
 INSERT INTO LCSD_DISTRICT (district_id, district_name_en, district_name_tc, district_shortform) VALUES (18, 'Sai Kung', '西貢區', 'SK');
 
+CREATE TABLE PSSUS_Booking_Record (
+                                      booking_Id INT NOT NULL,
+                                      student_Id VARCHAR(255) NOT NULL,
+                                      campaign_Detail VARCHAR(255),
+                                      campaign_remark VARCHAR(255),
+                                      join_person VARCHAR(255),
+                                      email VARCHAR(255),
+                                      phone VARCHAR(20),
+                                      personal_trainer VARCHAR(255),
+                                      schedule_id INT,
+                                      PRIMARY KEY (booking_Id),
+                                      FOREIGN KEY (schedule_id) REFERENCES LCSD_SOCCER_PITCH_SCHEDULE(id)
+);
 
-
+CREATE SEQUENCE booking_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;

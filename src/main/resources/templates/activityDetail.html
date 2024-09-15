@@ -141,8 +141,6 @@ width: calc(50% - 8px);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-
-
 </style>
 <body>
 <nav>
@@ -192,8 +190,9 @@ width: calc(50% - 8px);
             <h5 class="mb-0" style="margin-left: 7px;">Booking Detail</h5>
         </div>
         <form id="activityForm" name="activityForm" action="actReg" method="POST">
+        <input id="scheduleId" type="hidden" name="name" th:value="${scheduleId}" required/>
         <div class="item">
-            <p>Name<span >*</span></p>
+            <p>Host Name<span >*</span></p>
             <div class="name-item">
                 <input type="text" id="firstName" name="name" th:value="${student.firstName}" placeholder="First" disabled/>
                 <input type="text" id="lastName" name="name" th:value="${student.lastName}" placeholder="Last" disabled/>
@@ -204,6 +203,14 @@ width: calc(50% - 8px);
             <input id="studentId" type="text" name="name" required/>
         </div>
         <div class="item">
+            <p>Campaign Detail<span >*</span></p>
+            <input id="campaignDetail" type="text" name="name" required/>
+        </div>
+        <div class="item">
+            <p>Campaign Remark<span >*</span></p>
+            <input id="campaignRemark" type="text" name="name" required/>
+        </div>
+        <div class="item">
             <p>Number of person will join<span >*</span></p>
             <input id="joinPerson" type="text" name="name" required />
         </div>
@@ -212,9 +219,9 @@ width: calc(50% - 8px);
             <input id="email" type="text" th:value="${student.email}" disabled/>
             </div>
             <div class="item">
-            <p>Phone<span >*</span></p>
-            <input id="phone" type="text" name="name" required/>
-        </div>
+              <p>Phone<span >*</span></p>
+              <input id="phone" type="text" name="name" required/>
+            </div>
             <div class="item">
              <p>Booking Time Slot</p>
                 <div class="name-item">
@@ -223,20 +230,21 @@ width: calc(50% - 8px);
                     <input type="text" id="endTime" th:value="${schedules.session_end_time}" placeholder="End Time" disabled />
                 </div>
             </div>
-        <div class="item">
-            <p>Remarks</p>
-            <input id="remark" type="text" name="name" />
-        </div>
+            <div class="item">
+                <p>Remarks</p>
+                <input id="remark" type="text" name="name" />
+            </div>
         <div class="item">
             <p>Booking Venue</p>
             <div class="city-item">
-                <input type="text" id="addrLn1" th:value="${schedules.venue_address_en}" placeholder="English Address" disabled />
-                <input type="text" id="addrLn2" th:value="${schedules.venue_address_tc}" placeholder="Chinese Address" disabled />
+                <input type="text" id="addrLn2" th:value="${schedules.venue_name_en} + ' (' + ${schedules.venue_name_tc} + ')'" placeholder="Chinese Address" disabled />
+                <input type="text" id="addrLn1" th:value="${schedules.venue_address_en} + ' (' + ${schedules.venue_address_tc} + ')' " placeholder="Address" disabled />
                 <input type="text" id="addrLn3" th:value="${schedules.facility_location_name_en} + ' ' + ${schedules.facility_location_name_tc}" placeholder="loc" disabled/>
             </div>
             <div class="item">
-           <div id="map"></div>
-        </div>
+                <p>Map Location</p>
+                <div id="map"></div>
+            </div>
         </div>
         <div class="question">
             <p>Do you require a trainer? (Sport Consultant from HKUST, free for charge)</p>
@@ -275,15 +283,18 @@ width: calc(50% - 8px);
         $('#activityForm').on('submit', function(event) {
             event.preventDefault();
             const activityForm = {
-                firstName: $('#firstName').val(),
-                lastName: $('#lastName').val(),
-                studentId: $('#studentId').val(),
-                joinPerson : $('#joinPerson').val(),
+                first_Name: $('#firstName').val(),
+                last_Name: $('#lastName').val(),
+                student_Id: $('#studentId').val(),
+                join_Person : $('#joinPerson').val(),
                 email :$('#email').val(),
                 phone :$('#phone').val(),
-                personalTrainer: $('input[name="personalTrainer"]:checked').val(),
-                startTime: $('#startTime').val(),
-                endTime : $('#endTime').val()
+                personal_trainer: $('input[name="personalTrainer"]:checked').val(),
+                campaign_Detail : $('#campaignDetail').val(),
+                campaign_Remark : $('#campaignRemark').val(),
+                start_Time: $('#startTime').val(),
+                end_Time : $('#endTime').val(),
+                schedule_Id : $('#scheduleId').val()
             };
             console.log(JSON.stringify(activityForm));
             $.ajax({
@@ -291,8 +302,14 @@ width: calc(50% - 8px);
                 url: '/actReg',
                 contentType: 'application/json',
                 data: JSON.stringify(activityForm),
+                dataType: 'json',
                 success: function(response) {
-                    $('#message').text(response);
+                    if (response.success) {
+                        alert('Registration Success');
+                        window.location.href = '/greeting';
+                    } else {
+                        alert(response.message);
+                    }
                 },
                 error: function() {
                     $('#message').text('Registration failed');

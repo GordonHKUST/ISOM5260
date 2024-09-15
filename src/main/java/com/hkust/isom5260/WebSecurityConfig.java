@@ -68,7 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.logout().logoutSuccessUrl("/").permitAll();
 	}
 
-	public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+	public class PSSUSAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 		@Override
 		public void onAuthenticationFailure(
 				HttpServletRequest request,
@@ -85,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public AuthenticationFailureHandler authenticationFailureHandler() {
-		return new CustomAuthenticationFailureHandler();
+		return new PSSUSAuthenticationFailureHandler();
 	}
 	
 }

@@ -2,7 +2,7 @@ package com.hkust.isom5260.service;
 
 import com.hkust.isom5260.dto.CustomUserDetails;
 import com.hkust.isom5260.dto.USTStudent;
-import com.hkust.isom5260.mapper.UserMapper;
+import com.hkust.isom5260.mapper.PSSUSUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 public class USTStudentDetailService implements UserDetailsService {
 
     @Autowired
-    private UserMapper userMapper;
+    private PSSUSUserMapper PSSUSUserMapper;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        USTStudent user = userMapper.selectByEmail(username);
+        USTStudent user = PSSUSUserMapper.selectByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

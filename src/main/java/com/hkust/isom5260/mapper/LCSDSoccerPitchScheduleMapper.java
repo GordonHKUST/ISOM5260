@@ -28,7 +28,8 @@ public interface LCSDSoccerPitchScheduleMapper {
             "    available_date,\n" +
             "    session_start_time,\n" +
             "    session_end_time,\n" +
-            "    available_courts\n" +
+            "    available_courts,\n" +
+            "    status_code\n" +
             ") VALUES (\n" +
             "    schedule_seq.NEXTVAL, \n"+
             "    #{district_name_en, jdbcType=VARCHAR},\n" +
@@ -48,6 +49,7 @@ public interface LCSDSoccerPitchScheduleMapper {
             "    #{session_start_time, jdbcType=VARCHAR},\n" +
             "    #{session_end_time, jdbcType=VARCHAR},\n" +
             "    #{available_courts, jdbcType=INTEGER}\n" +
+            "    #{status_code, jdbcType=VARCHAR},\n" +
             ")")
     void insert (LCSDSoccerPitchSchedule soccerPitch);
 
@@ -60,14 +62,23 @@ public interface LCSDSoccerPitchScheduleMapper {
 
     @Update(" UPDATE LCSD_SOCCER_PITCH_SCHEDULE\n" +
             " SET available_courts = #{available_courts , jdbcType=INTEGER}\n" +
+            " , status_code = #{status_code , jdbcType=VARCHAR}\n" +
             " WHERE venue_name_en = #{venue_name_en} AND available_date = #{available_date} AND session_start_time = #{session_start_time}")
-    void updateVenueAvaliableCount(LCSDSoccerPitchSchedule soccerPitch);
+    void update(LCSDSoccerPitchSchedule soccerPitch);
 
     @Select("Select * from LCSD_SOCCER_PITCH_SCHEDULE WHERE id = #{id}")
     List<LCSDSoccerPitchSchedule> getLCSDSoccerPitchScheduleById(int id);
 
-    @Select("    SELECT LCSD_SOCCER_PITCH_SCHEDULE.*\n" +
-            "    FROM LCSD_SOCCER_PITCH_SCHEDULE\n" +
-            "    WHERE available_courts > 0")
+    @Select("    SELECT LCSD_SOCCER_PITCH_SCHEDULE.* \n" +
+            "    FROM LCSD_SOCCER_PITCH_SCHEDULE \n" +
+            "    WHERE available_courts > 0 AND status_code = 'AVALIABLE'")
     List<LCSDSoccerPitchSchedule> getAvaliableLCSDSoccerPitchSchedule();
+
+    @Select("    SELECT LCSD_SOCCER_PITCH_SCHEDULE.* \n" +
+            "    FROM LCSD_SOCCER_PITCH_SCHEDULE \n" +
+            "    WHERE status_code = 'AVALIABLE' OR status_code is null")
+    List<LCSDSoccerPitchSchedule> getHouseKeepLCSDSoccerPitchSchedule();
+
+
+
 }

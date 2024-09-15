@@ -62,4 +62,7 @@ public class LCSDSoccerPitchSchedule {
 
     @SerializedName("Available_Courts")
     private String available_courts;
+
+    @SerializedName("status_code")
+    private String status_code;
 }

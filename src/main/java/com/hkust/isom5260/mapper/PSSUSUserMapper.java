@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface UserMapper {
+public interface PSSUSUserMapper {
 
     @Insert("insert into USTStudent(id, email , password ,firstName , lastName ) values (uststd_seq.nextval, #{email}, #{password}, #{firstName} , #{lastName})")
     void insert (USTStudent usr);

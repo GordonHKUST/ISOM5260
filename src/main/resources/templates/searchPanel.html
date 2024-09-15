@@ -107,7 +107,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="distictName">District Name:</label>
-                            <input type="text" class="form-control" id="distictName" placeholder="Filter by venue name" />
+                            <select class="form-control" id="distictName" name="distictName">
+                                <option value="">Select a district</option>
+                                <th:block th:each="district : ${districts}">
+                                    <option th:value="${district.district_name_en}"
+                                            th:text="${district.district_name_en} + ' (' + ${district.district_name_tc} + ')'"></option>
+                                </th:block>
+                            </select>
                         </div>
                     </div>
                 </div>

@@ -99,11 +99,16 @@
       </div>
     </div>
     <div class="activity-data">
-      <table id="avaliableCourt2" class="table table-striped">
+      <table id="myActivity" class="table table-striped">
         <thead>
         <tr>
-          <th>Register?</th>
-          <th>Sayonana</th>
+          <th>Booking ID</th>
+          <th>Campaign Detail</th>
+          <th>Schedule Available Date</th>
+          <th>Schedule Location</th>
+          <th>Schedule Start Time</th>
+          <th>Schedule End Time</th>
+          <th>Activity Status</th>
         </tr>
         </thead>
       </table>
@@ -136,6 +141,36 @@
 
 <script>
   $(document).ready(function() {
+
+    $('#myActivity').DataTable({
+      "sAjaxSource": "/getRegisterActivity",
+      "sAjaxDataProp": "",
+      "order": [[ 0, "asc" ]],
+      "columns": [
+        { "data": "booking_Id"},
+        { "data": "campaign_Detail"},
+        { "data": "available_date"},
+        { "data": "venue_Name_En"},
+        { "data": "session_start_time"},
+        { "data": "session_end_time"},
+        { "data": "status_code"}
+      ],
+      "columnDefs": [
+        {
+          "targets": 0,
+          "render": function(data, type, row) {
+            return `<a href="/activityDetail?bookingId=${data}">Click</a>`;
+          }
+        }
+      ],
+      layout: {
+        top1: {
+          searchPanes: {
+            viewTotal: true
+          }
+        }
+      }
+    });
 
     $('#avaliableCourt').DataTable({
       "sAjaxSource": "/getRecentAvaSch",
