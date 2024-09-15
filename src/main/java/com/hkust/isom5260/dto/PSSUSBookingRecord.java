@@ -16,15 +16,15 @@ public class PSSUSBookingRecord {
     @SerializedName("campaign_Remark")
     private String campaign_Remark;
     @SerializedName("join_person")
-    private String join_Person;
+    private String join_person;
     @SerializedName("email")
     private String email;
     @SerializedName("phone")
     private String phone;
     @SerializedName("personal_trainer")
-    private String personal_Trainer;
+    private String personal_trainer;
     @SerializedName("schedule_id")
-    private String schedule_Id;
+    private String schedule_id;
     @SerializedName("status_code")
     private String status_code;
 

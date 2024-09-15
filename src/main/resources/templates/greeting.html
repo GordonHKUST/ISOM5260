@@ -75,19 +75,23 @@
 
       <div class="boxes">
         <div class="box box1">
-          <i class="uil uil-thumbs-up"></i>
+          <i class="uil uil-money-bill"></i>
           <span class="text">Quota</span>
           <span class="number">$</span>
         </div>
         <div class="box box2">
-          <i class="uil uil-comments"></i>
-          <span class="text">Total event join/establish</span>
-          <span class="number">20,120</span>
+          <i class="uil uil-calendar-alt"></i>
+          <span class="text">Total available event</span>
+          <span class="number">
+            <div th:text="${avaliableSoccerSize}"></div>
+          </span>
         </div>
         <div class="box box3">
-          <i class="uil uil-share"></i>
-          <span class="text">Avaliable Court</span>
-          <span class="number">10,120</span>
+          <i class="uil uil-bell"></i>
+          <span class="text">Your event</span>
+          <span class="number">
+          <div th:text="${youreventsize}"></div>
+          </span>
         </div>
       </div>
     </div>
@@ -95,7 +99,7 @@
     <div class="activity">
       <div class="title">
         <i class="uil uil-clock-three"></i>
-        <span class="text">My Recent Booking</span>
+        <span class="text">My Recent Created Campaign</span>
       </div>
     </div>
     <div class="activity-data">

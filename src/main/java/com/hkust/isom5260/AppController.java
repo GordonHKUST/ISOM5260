@@ -68,15 +68,18 @@ public class AppController {
 	public String activityDetail(Model model,@RequestParam(value="id",required = false) Integer id,
 								 @RequestParam(value="bookingId",required = false) Integer bookingId,
 								 Principal principal) {
+		boolean isBooking = false;
 		USTStudent ustStudent = PSSUSUserMapper.selectByEmail(principal.getName());
 		model.addAttribute("student", ustStudent);
 		if (bookingId != null) {
             PSSUSBookingRecord bookingRecord =
 					pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
-            id = Integer.valueOf(bookingRecord.getSchedule_Id());
+            id = Integer.valueOf(bookingRecord.getSchedule_id());
+			isBooking = true;
 		}
 		List<LCSDSoccerPitchSchedule> schedules =
 				lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(id);
+		model.addAttribute("isBooking", isBooking);
 		model.addAttribute("scheduleId", id);
 		model.addAttribute("schedules", schedules.get(0));
 		return "activityDetail";
@@ -89,7 +92,7 @@ public class AppController {
 		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getPSSUSBookingRecordByEmail(email);
 		for(PSSUSBookingRecord record : schedules) {
 			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
-					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_Id())).get(0);
+					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
 			record.setSession_start_time(schedule.getSession_start_time());
 			record.setSession_end_time(schedule.getSession_end_time());
 			record.setAvailable_date(schedule.getAvailable_date());
@@ -124,7 +127,7 @@ public class AppController {
 			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
 		} else {
 			LCSDSoccerPitchSchedule lcsdSoccerPitchSchedule =
-					lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_Id())).get(0);
+					lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
 			int avaliableCount = Integer.valueOf(lcsdSoccerPitchSchedule.getAvailable_courts()) - 1;
 			if(avaliableCount <= 0) {
 				lcsdSoccerPitchSchedule.setAvailable_courts(String.valueOf(0));
@@ -147,10 +150,10 @@ public class AppController {
 	}
 	
 	@GetMapping("/users")
-	public String listUsers(Model model, Principal principal,HttpServletResponse response) throws JRException, SQLException, IOException {
-		List<USTStudent> listUSTStudents = PSSUSUserMapper.selectAll();
+	public String greeting(Model model, Principal principal,HttpServletResponse response) throws JRException, SQLException, IOException {
 		model.addAttribute("user", principal.getName());
-		model.addAttribute("listUsers", listUSTStudents);
+		model.addAttribute("avaliableSoccerSize",lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
+		model.addAttribute("youreventsize",pssusBookingMapper.getPSSUSBookingRecordByEmail(principal.getName()).size());
 		return "greeting";
 	}
 

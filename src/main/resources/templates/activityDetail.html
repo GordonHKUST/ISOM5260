@@ -253,7 +253,7 @@ width: calc(50% - 8px);
                 <label><input type="radio" value="N" name="personalTrainer"/><span>No</span></label>
             </div>
         </div>
-        <div class="btn-block">
+        <div class="btn-block" th:if="${isBooking == false}">
             <button type="submit" >Apply</button>
         </div>
         </form>
@@ -286,7 +286,7 @@ width: calc(50% - 8px);
                 first_Name: $('#firstName').val(),
                 last_Name: $('#lastName').val(),
                 student_Id: $('#studentId').val(),
-                join_Person : $('#joinPerson').val(),
+                join_person : $('#joinPerson').val(),
                 email :$('#email').val(),
                 phone :$('#phone').val(),
                 personal_trainer: $('input[name="personalTrainer"]:checked').val(),
@@ -294,7 +294,7 @@ width: calc(50% - 8px);
                 campaign_Remark : $('#campaignRemark').val(),
                 start_Time: $('#startTime').val(),
                 end_Time : $('#endTime').val(),
-                schedule_Id : $('#scheduleId').val()
+                schedule_id : $('#scheduleId').val()
             };
             console.log(JSON.stringify(activityForm));
             $.ajax({

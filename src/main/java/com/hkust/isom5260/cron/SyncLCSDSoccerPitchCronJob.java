@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
 import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,7 +43,7 @@ public class SyncLCSDSoccerPitchCronJob {
         }
     }
 
-    @Scheduled(cron = "* * 1 * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     protected void executeInternal() throws JobExecutionException {
         System.out.println("Job executed at: " + System.currentTimeMillis());
         String urlString = properties.getProperty("lcsd.soccer.pitch.api.url");
@@ -64,13 +65,40 @@ public class SyncLCSDSoccerPitchCronJob {
         Gson gson = new Gson();
         List<LCSDSoccerPitchSchedule> soccerPitches = gson.fromJson(jsonBuilder.toString(), new TypeToken<List<LCSDSoccerPitchSchedule>>(){}.getType());
         for(LCSDSoccerPitchSchedule soccerPitch : soccerPitches) {
-            if(soccerPitchScheduleMapper.checkVenueExists(soccerPitch) > 0) {
+            List<LCSDSoccerPitchSchedule> existedSchedule = soccerPitchScheduleMapper.getExistedSchedule(soccerPitch);
+            if(!CollectionUtils.isEmpty(existedSchedule)
+                    && !StringUtils.equals(existedSchedule.get(0).getStatus_code(),"AVALIABLE")) {
+                System.out.println(
+                        "Schedule : " +
+                                soccerPitch.getVenue_name_en() + " " +
+                                soccerPitch.getAvailable_date() + " "  +
+                                soccerPitch.getSession_start_time() + " - " +
+                                soccerPitch.getSession_end_time() + " had been skipped as it is not available already");
+                continue;
+            }
+            if(!CollectionUtils.isEmpty(existedSchedule)) {
                 if(StringUtils.equals(soccerPitch.getAvailable_courts(),"0")) {
                     soccerPitch.setStatus_code("FULL_BOOKING");
                 }
+                System.out.println(
+                        "Schedule : " +
+                                soccerPitch.getVenue_name_en() + " " +
+                                soccerPitch.getAvailable_date() + " "  +
+                                soccerPitch.getSession_start_time() + " - "  +
+                                soccerPitch.getSession_end_time() + " had been updated");
                 soccerPitchScheduleMapper.update(soccerPitch);
             } else {
-                soccerPitch.setStatus_code("AVALIABLE");
+                if(StringUtils.equals(soccerPitch.getAvailable_courts(),"0")) {
+                    soccerPitch.setStatus_code("FULL_BOOKING");
+                } else {
+                    soccerPitch.setStatus_code("AVALIABLE");
+                }
+                System.out.println("Schedule : " +
+                                            soccerPitch.getVenue_name_en() + " " +
+                                            soccerPitch.getAvailable_date() + " "  +
+                                            soccerPitch.getSession_start_time() +  " - "  +
+                                            soccerPitch.getSession_end_time() +
+                                            " had been insert");
                 soccerPitchScheduleMapper.insert(soccerPitch);
             }
         }

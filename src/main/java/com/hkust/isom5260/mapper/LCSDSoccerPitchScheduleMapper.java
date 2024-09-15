@@ -53,12 +53,12 @@ public interface LCSDSoccerPitchScheduleMapper {
             ")")
     void insert (LCSDSoccerPitchSchedule soccerPitch);
 
-    @Select("        SELECT COUNT(*) \n" +
+    @Select("        SELECT * \n" +
             "        FROM LCSD_SOCCER_PITCH_SCHEDULE \n" +
             "        WHERE venue_name_en = #{venue_name_en} \n" +
             "          AND available_date = #{available_date} \n" +
             "          AND session_start_time = #{session_start_time}")
-    int checkVenueExists(LCSDSoccerPitchSchedule soccerPitch);
+    List<LCSDSoccerPitchSchedule> getExistedSchedule(LCSDSoccerPitchSchedule soccerPitch);
 
     @Update(" UPDATE LCSD_SOCCER_PITCH_SCHEDULE\n" +
             " SET available_courts = #{available_courts , jdbcType=INTEGER}\n" +

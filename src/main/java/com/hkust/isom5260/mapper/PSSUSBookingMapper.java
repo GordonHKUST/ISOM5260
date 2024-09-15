@@ -14,8 +14,8 @@ public interface PSSUSBookingMapper {
             "(booking_Id, student_Id, campaign_Detail, campaign_remark, " +
             "join_person, email, phone, personal_trainer, schedule_id, status_code) " +
             "VALUES " +
-            "(booking_id_seq.NEXTVAL, #{studentId}, #{campaignDetail}, #{campaignRemark}, " +
-            "#{joinPerson}, #{email}, #{phone}, #{personalTrainer}, #{scheduleId} , #{statusCode})")
+            "(booking_id_seq.NEXTVAL, #{student_Id}, #{campaign_Detail}, #{campaign_Remark}, " +
+            "#{join_person}, #{email}, #{phone}, #{personal_trainer}, #{schedule_id} , #{status_code})")
     void insert(PSSUSBookingRecord bookingRecord);
 
     @Select("Select * from PSSUS_Booking_Record WHERE email = #{email}")
