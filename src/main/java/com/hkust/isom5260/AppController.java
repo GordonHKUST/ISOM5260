@@ -76,6 +76,7 @@ public class AppController {
 					pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
             id = Integer.valueOf(bookingRecord.getSchedule_id());
 			isBooking = true;
+			model.addAttribute("bookingRecord",bookingRecord);
 		}
 		List<LCSDSoccerPitchSchedule> schedules =
 				lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(id);

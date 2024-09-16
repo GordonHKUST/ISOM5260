@@ -200,27 +200,52 @@ width: calc(50% - 8px);
         </div>
         <div class="item">
             <p>Student ID<span>*</span></p>
-            <input id="studentId" type="text" name="name" required/>
+            <div th:if="${bookingRecord != null}">
+                <input id="studentId" type="text" name="name" th:value="${bookingRecord.student_Id}" disabled/>
+            </div>
+            <div th:if="${bookingRecord == null}">
+                <input id="studentId" type="text" name="name" required/>
+            </div>
         </div>
         <div class="item">
             <p>Campaign Detail<span >*</span></p>
-            <input id="campaignDetail" type="text" name="name" required/>
+            <div th:if="${bookingRecord != null}">
+                <input id="campaignDetail" type="text" name="name" th:value="${bookingRecord.campaign_Detail}" disabled/>
+            </div>
+            <div th:if="${bookingRecord == null}">
+                <input id="campaignDetail" type="text" name="name" required/>
+            </div>
         </div>
         <div class="item">
             <p>Campaign Remark<span >*</span></p>
-            <input id="campaignRemark" type="text" name="name" required/>
+            <div th:if="${bookingRecord != null}">
+                <input id="campaignRemark" type="text" name="name" th:value="${bookingRecord.campaign_Remark}" disabled/>
+            </div>
+            <div th:if="${bookingRecord == null}">
+                <input id="campaignRemark" type="text" name="name" required/>
+            </div>
         </div>
         <div class="item">
             <p>Number of person will join<span >*</span></p>
-            <input id="joinPerson" type="text" name="name" required />
+            <div th:if="${bookingRecord != null}">
+                <input id="joinPerson" type="number" name="name" th:value="${bookingRecord.join_person}" disabled/>
+            </div>
+            <div th:if="${bookingRecord == null}">
+                <input id="joinPerson" type="number" name="name" required/>
+            </div>
         </div>
             <div class="item">
             <p>Email<span >*</span></p>
-            <input id="email" type="text" th:value="${student.email}" disabled/>
+            <input id="email" type="email" th:value="${student.email}" disabled/>
             </div>
             <div class="item">
-              <p>Phone<span >*</span></p>
-              <input id="phone" type="text" name="name" required/>
+              <p>Contact Phone<span >*</span></p>
+                <div th:if="${bookingRecord != null}">
+                    <input id="phone" type="number" name="name" th:value="${bookingRecord.phone}" disabled/>
+                </div>
+                <div th:if="${bookingRecord == null}">
+                    <input id="phone" type="number" name="name" required/>
+                </div>
             </div>
             <div class="item">
              <p>Booking Time Slot</p>
@@ -229,10 +254,6 @@ width: calc(50% - 8px);
                     to
                     <input type="text" id="endTime" th:value="${schedules.session_end_time}" placeholder="End Time" disabled />
                 </div>
-            </div>
-            <div class="item">
-                <p>Remarks</p>
-                <input id="remark" type="text" name="name" />
             </div>
         <div class="item">
             <p>Booking Venue</p>
@@ -248,12 +269,26 @@ width: calc(50% - 8px);
         </div>
         <div class="question">
             <p>Do you require a trainer? (Sport Consultant from HKUST, free for charge)</p>
+            <div th:if="${bookingRecord != null}">
             <div class="question-answer">
-                <label><input type="radio" value="Y" name="personalTrainer"/><span>Yes</span></label>
-                <label><input type="radio" value="N" name="personalTrainer"/><span>No</span></label>
+                <div th:if="${bookingRecord.personal_trainer == 'Y'}">
+                <label><input type="radio" value="Y" name="personalTrainer" checked disabled/><span>Yes</span></label>
+                <label><input type="radio" value="N" name="personalTrainer" disabled/><span>No</span></label>
+                </div>
+                <div th:if="${bookingRecord.personal_trainer == 'N'}">
+                 <label><input type="radio" value="Y" name="personalTrainer" disabled/><span>Yes</span></label>
+                 <label><input type="radio" value="N" name="personalTrainer" checked disabled/><span>No</span></label>
+                </div>
+            </div>
+            </div>
+            <div th:if="${bookingRecord == null}">
+               <div class="question-answer">
+                   <label><input type="radio" value="Y" name="personalTrainer" required/><span>Yes</span></label>
+                   <label><input type="radio" value="N" name="personalTrainer" required/><span>No</span></label>
+               </div>
             </div>
         </div>
-        <div class="btn-block" th:if="${isBooking == false}">
+        <div class="btn-block" th:if="${bookingRecord == null}">
             <button type="submit" >Apply</button>
         </div>
         </form>
@@ -306,7 +341,7 @@ width: calc(50% - 8px);
                 success: function(response) {
                     if (response.success) {
                         alert('Registration Success');
-                        window.location.href = '/greeting';
+                        window.location.href = '/users';
                     } else {
                         alert(response.message);
                     }

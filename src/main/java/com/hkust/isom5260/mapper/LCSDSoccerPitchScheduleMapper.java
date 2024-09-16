@@ -48,8 +48,8 @@ public interface LCSDSoccerPitchScheduleMapper {
             "    #{available_date, jdbcType=VARCHAR},\n" +
             "    #{session_start_time, jdbcType=VARCHAR},\n" +
             "    #{session_end_time, jdbcType=VARCHAR},\n" +
-            "    #{available_courts, jdbcType=INTEGER}\n" +
-            "    #{status_code, jdbcType=VARCHAR},\n" +
+            "    #{available_courts, jdbcType=INTEGER},\n" +
+            "    #{status_code, jdbcType=VARCHAR}\n" +
             ")")
     void insert (LCSDSoccerPitchSchedule soccerPitch);
 
