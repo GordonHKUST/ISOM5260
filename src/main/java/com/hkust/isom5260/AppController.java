@@ -8,10 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
-import com.hkust.isom5260.dto.PSSUSBookingRecord;
-import com.hkust.isom5260.dto.LCSDDistrict;
-import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
-import com.hkust.isom5260.dto.USTStudent;
+import com.hkust.isom5260.dto.*;
 import com.hkust.isom5260.mapper.LCSDDistrictMapper;
 import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
 import com.hkust.isom5260.mapper.PSSUSBookingMapper;
@@ -68,6 +65,9 @@ public class AppController {
 	public String activityDetail(Model model,@RequestParam(value="id",required = false) Integer id,
 								 @RequestParam(value="bookingId",required = false) Integer bookingId,
 								 Principal principal) {
+		if(principal == null) {
+			return "login";
+		}
 		boolean isBooking = false;
 		USTStudent ustStudent = PSSUSUserMapper.selectByEmail(principal.getName());
 		model.addAttribute("student", ustStudent);
@@ -117,8 +117,18 @@ public class AppController {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String encodedPassword = passwordEncoder.encode(USTStudent.getPassword());
 		USTStudent.setPassword(encodedPassword);
+		USTStudentWallet wallet = populateNewStudentBalance(USTStudent);
 		PSSUSUserMapper.insert(USTStudent);
+		PSSUSUserMapper.insert_wallet(wallet);
 		return "register_success";
+	}
+
+	private static USTStudentWallet populateNewStudentBalance(USTStudent USTStudent) {
+		USTStudentWallet wallet = new USTStudentWallet();
+		wallet.setCurrBalance(3000);
+		wallet.setLastMonthBalanceLeft(0);
+		wallet.setEmail(USTStudent.getEmail());
+		return wallet;
 	}
 
 	@PostMapping("/actReg")
@@ -152,6 +162,15 @@ public class AppController {
 	
 	@GetMapping("/users")
 	public String greeting(Model model, Principal principal,HttpServletResponse response) throws JRException, SQLException, IOException {
+		if(principal == null) {
+			return "/login";
+		}
+		USTStudentWallet wallet = pssusBookingMapper.getUSTStudentWalletByEmail(principal.getName()).get(0);
+		   if(wallet != null) {
+		       model.addAttribute("walletAmt",wallet.getCurrBalance());
+		   } else {
+		   	   model.addAttribute("walletAmt","NaN");
+		   }
 		model.addAttribute("user", principal.getName());
 		model.addAttribute("avaliableSoccerSize",lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
 		model.addAttribute("youreventsize",pssusBookingMapper.getPSSUSBookingRecordByEmail(principal.getName()).size());

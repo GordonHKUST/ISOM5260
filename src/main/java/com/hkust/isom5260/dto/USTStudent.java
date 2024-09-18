@@ -17,7 +17,11 @@ public class USTStudent {
 
     private String lastName;
 
+    private String studentId;
+
+    private String program;
+
+    private String studyYear;
+
     private String phone;
-
-
 }

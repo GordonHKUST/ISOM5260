@@ -1,9 +1,10 @@
 package com.hkust.isom5260.cron;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
 import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,101 +33,147 @@ public class SyncLCSDSoccerPitchCronJob {
     @Autowired
     private LCSDSoccerPitchScheduleMapper soccerPitchScheduleMapper;
 
-    private static Properties properties = new Properties();
+    private static final Properties properties = new Properties();
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public SyncLCSDSoccerPitchCronJob() {
+        loadProperties();
+    }
+
+    private void loadProperties() {
         String propertiesFilePath = "src/main/resources/application.properties";
         try (InputStream input = Files.newInputStream(Paths.get(propertiesFilePath))) {
             properties.load(input);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to load properties file", e);
         }
     }
 
     @Scheduled(cron = "0 */5 * * * ?")
     protected void executeInternal() throws JobExecutionException {
         System.out.println("Job executed at: " + System.currentTimeMillis());
-        String urlString = properties.getProperty("lcsd.soccer.pitch.api.url");
+        String jsonResponse = fetchJsonData(properties.getProperty("lcsd.soccer.pitch.api.url"));
+
+        if (jsonResponse == null) {
+            return;
+        }
+
+        List<LCSDSoccerPitchSchedule> soccerPitches = parseJsonData(jsonResponse);
+        syncSoccerPitchesSchedule(soccerPitches);
+        performHousekeeping();
+    }
+
+    private String fetchJsonData(String urlString) {
         StringBuilder jsonBuilder = new StringBuilder();
         try {
             URL url = new URL(urlString);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                jsonBuilder.append(inputLine);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    jsonBuilder.append(line);
+                }
             }
-            in.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
+        return jsonBuilder.toString();
+    }
+
+    private List<LCSDSoccerPitchSchedule> parseJsonData(String jsonData) {
         Gson gson = new Gson();
-        List<LCSDSoccerPitchSchedule> soccerPitches = gson.fromJson(jsonBuilder.toString(), new TypeToken<List<LCSDSoccerPitchSchedule>>(){}.getType());
-        for(LCSDSoccerPitchSchedule soccerPitch : soccerPitches) {
-            List<LCSDSoccerPitchSchedule> existedSchedule = soccerPitchScheduleMapper.getExistedSchedule(soccerPitch);
-            if(!CollectionUtils.isEmpty(existedSchedule)
-                    && !StringUtils.equals(existedSchedule.get(0).getStatus_code(),"AVALIABLE")) {
-                System.out.println(
-                        "Schedule : " +
-                                soccerPitch.getVenue_name_en() + " " +
-                                soccerPitch.getAvailable_date() + " "  +
-                                soccerPitch.getSession_start_time() + " - " +
-                                soccerPitch.getSession_end_time() + " had been skipped as it is not available already");
+        return gson.fromJson(jsonData, new TypeToken<List<LCSDSoccerPitchSchedule>>() {}.getType());
+    }
+
+    private void syncSoccerPitchesSchedule(List<LCSDSoccerPitchSchedule> soccerPitches) {
+        for (LCSDSoccerPitchSchedule soccerPitch : soccerPitches) {
+            List<LCSDSoccerPitchSchedule> existingSchedules = soccerPitchScheduleMapper.getExistedSchedule(soccerPitch);
+            if (isScheduleUnavailable(existingSchedules)) {
+                System.out.println("Schedule skipped: " + formatSchedule(soccerPitch) + " (not available)");
                 continue;
             }
-            if(!CollectionUtils.isEmpty(existedSchedule)) {
-                if(StringUtils.equals(soccerPitch.getAvailable_courts(),"0")) {
-                    soccerPitch.setStatus_code("FULL_BOOKING");
-                }
-                System.out.println(
-                        "Schedule : " +
-                                soccerPitch.getVenue_name_en() + " " +
-                                soccerPitch.getAvailable_date() + " "  +
-                                soccerPitch.getSession_start_time() + " - "  +
-                                soccerPitch.getSession_end_time() + " had been updated");
-                soccerPitchScheduleMapper.update(soccerPitch);
+            if (CollectionUtils.isNotEmpty(existingSchedules)) {
+                updateSchedule(soccerPitch);
             } else {
-                if(StringUtils.equals(soccerPitch.getAvailable_courts(),"0")) {
-                    soccerPitch.setStatus_code("FULL_BOOKING");
-                } else {
-                    soccerPitch.setStatus_code("AVALIABLE");
-                }
-                System.out.println("Schedule : " +
-                                            soccerPitch.getVenue_name_en() + " " +
-                                            soccerPitch.getAvailable_date() + " "  +
-                                            soccerPitch.getSession_start_time() +  " - "  +
-                                            soccerPitch.getSession_end_time() +
-                                            " had been insert");
-                soccerPitchScheduleMapper.insert(soccerPitch);
-            }
-        }
-        // Housekeep for existing Record
-        List<LCSDSoccerPitchSchedule> houseKeepLCSDSoccerPitchSchedule =
-                soccerPitchScheduleMapper.getHouseKeepLCSDSoccerPitchSchedule();
-        for(LCSDSoccerPitchSchedule soccerPitch : houseKeepLCSDSoccerPitchSchedule) {
-            if (StringUtils.equals(soccerPitch.getStatus_code(), "AVALIABLE")
-                    || StringUtils.isEmpty(soccerPitch.getStatus_code())) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                try {
-                    LocalDate inputDate = LocalDate.parse(soccerPitch.getAvailable_date(), dateFormatter);
-                    LocalTime inputTime = LocalTime.parse(soccerPitch.getSession_start_time(), timeFormatter);
-                    LocalDateTime inputDateTime = LocalDateTime.of(inputDate, inputTime);
-                    LocalDateTime now = LocalDateTime.now();
-                    if (inputDateTime.isBefore(now)) {
-                        soccerPitch.setAvailable_courts(String.valueOf(0));
-                        soccerPitch.setStatus_code("TIME_SLOT_STARTED");
-                    } else {
-                        soccerPitch.setStatus_code("AVALIABLE");
-                    }
-                    soccerPitchScheduleMapper.update(soccerPitch);
-                } catch (DateTimeParseException e) {
-                    System.out.println("Invalid date or time format: " + e.getMessage());
-                }
+                insertSchedule(soccerPitch);
             }
         }
     }
-}
 
+    private boolean isScheduleUnavailable(List<LCSDSoccerPitchSchedule> existingSchedules) {
+        return CollectionUtils.isNotEmpty(existingSchedules) &&
+                (!StringUtils.equals(existingSchedules.get(0).getStatus_code(), "AVALIABLE") ||
+                        StringUtils.isEmpty(existingSchedules.get(0).getStatus_code()));
+    }
+
+    private void logScheduleSkipped(LCSDSoccerPitchSchedule soccerPitch) {
+        System.out.println("Schedule skipped: " + formatSchedule(soccerPitch) + " (not available)");
+    }
+
+    private void updateSchedule(LCSDSoccerPitchSchedule soccerPitch) {
+        setStatusCode(soccerPitch);
+        System.out.println("Schedule updated: " + formatSchedule(soccerPitch));
+        soccerPitchScheduleMapper.update(soccerPitch);
+    }
+
+    private void insertSchedule(LCSDSoccerPitchSchedule soccerPitch) {
+        setStatusCode(soccerPitch);
+        System.out.println("Schedule inserted: " + formatSchedule(soccerPitch));
+        soccerPitchScheduleMapper.insert(soccerPitch);
+    }
+
+    private void setStatusCode(LCSDSoccerPitchSchedule soccerPitch) {
+        if (StringUtils.equals(soccerPitch.getAvailable_courts(), "0")) {
+            soccerPitch.setStatus_code("FULL_BOOKING");
+        } else {
+            soccerPitch.setStatus_code("AVALIABLE");
+        }
+    }
+
+    private String formatSchedule(LCSDSoccerPitchSchedule soccerPitch) {
+        return String.format("%s %s %s - %s",
+                soccerPitch.getVenue_name_en(),
+                soccerPitch.getAvailable_date(),
+                soccerPitch.getSession_start_time(),
+                soccerPitch.getSession_end_time());
+    }
+
+    private void performHousekeeping() {
+        List<LCSDSoccerPitchSchedule> houseKeepSchedules = soccerPitchScheduleMapper.getHouseKeepLCSDSoccerPitchSchedule();
+        for (LCSDSoccerPitchSchedule soccerPitch : houseKeepSchedules) {
+            if (isHousekeepingRequired(soccerPitch)) {
+                updateHousekeepingSchedule(soccerPitch);
+            }
+        }
+    }
+
+    private boolean isHousekeepingRequired(LCSDSoccerPitchSchedule soccerPitch) {
+        return StringUtils.equals(soccerPitch.getStatus_code(), "AVALIABLE") || StringUtils.isEmpty(soccerPitch.getStatus_code());
+    }
+
+    private void updateHousekeepingSchedule(LCSDSoccerPitchSchedule soccerPitch) {
+        try {
+            LocalDateTime inputDateTime = parseScheduleTime(soccerPitch);
+            if (inputDateTime.isBefore(LocalDateTime.now())) {
+                soccerPitch.setAvailable_courts("0");
+                soccerPitch.setStatus_code("TIME_SLOT_STARTED");
+            } else {
+                soccerPitch.setStatus_code("AVALIABLE");
+            }
+            soccerPitchScheduleMapper.update(soccerPitch);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date or time format: " + e.getMessage());
+        }
+    }
+
+    private LocalDateTime parseScheduleTime(LCSDSoccerPitchSchedule soccerPitch) {
+        LocalDate inputDate = LocalDate.parse(soccerPitch.getAvailable_date(), DATE_FORMATTER);
+        LocalTime inputTime = LocalTime.parse(soccerPitch.getSession_start_time(), TIME_FORMATTER);
+        return LocalDateTime.of(inputDate, inputTime);
+    }
+}

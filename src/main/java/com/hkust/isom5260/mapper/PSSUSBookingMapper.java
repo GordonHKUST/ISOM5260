@@ -2,6 +2,7 @@ package com.hkust.isom5260.mapper;
 
 import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
 import com.hkust.isom5260.dto.PSSUSBookingRecord;
+import com.hkust.isom5260.dto.USTStudentWallet;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -20,6 +21,9 @@ public interface PSSUSBookingMapper {
 
     @Select("Select * from PSSUS_Booking_Record WHERE email = #{email}")
     List<PSSUSBookingRecord> getPSSUSBookingRecordByEmail(String email);
+
+    @Select("Select * from UST_STUDENT_WALLET WHERE email = #{email}")
+    List<USTStudentWallet> getUSTStudentWalletByEmail(String email);
 
     @Select("Select * from PSSUS_Booking_Record WHERE booking_Id = #{booking_Id}")
     List<PSSUSBookingRecord> getPSSUSBookingRecordByBookingId(String booking_Id);
