@@ -120,6 +120,10 @@ CREATE SEQUENCE booking_id_seq
     INCREMENT BY 1
     NOCACHE;
 
+CREATE SEQUENCE booking_join_seq
+    START WITH 1
+    INCREMENT BY 1;
+
 CREATE SEQUENCE wallet_id_seq
     START WITH 1
     INCREMENT BY 1;

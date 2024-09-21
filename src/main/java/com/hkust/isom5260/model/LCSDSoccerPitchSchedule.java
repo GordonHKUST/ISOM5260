@@ -1,10 +1,8 @@
-package com.hkust.isom5260.dto;
+package com.hkust.isom5260.model;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.sql.Date;
 
 @Getter
 @Setter

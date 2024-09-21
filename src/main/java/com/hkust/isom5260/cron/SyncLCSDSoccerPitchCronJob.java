@@ -2,8 +2,10 @@ package com.hkust.isom5260.cron;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.hkust.isom5260.dto.LCSDSoccerPitchSchedule;
+import com.hkust.isom5260.model.LCSDSoccerPitchSchedule;
+import com.hkust.isom5260.model.PSSUSBookingRecord;
 import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
+import com.hkust.isom5260.mapper.PSSUSBookingMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class SyncLCSDSoccerPitchCronJob {
 
     @Autowired
     private LCSDSoccerPitchScheduleMapper soccerPitchScheduleMapper;
+
+    @Autowired
+    private PSSUSBookingMapper pssusBookingMapper;
 
     private static final Properties properties = new Properties();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -121,18 +126,18 @@ public class SyncLCSDSoccerPitchCronJob {
     }
 
     private void updateSchedule(LCSDSoccerPitchSchedule soccerPitch) {
-        setStatusCode(soccerPitch);
+        checkStatusCode(soccerPitch);
         System.out.println("Schedule updated: " + formatSchedule(soccerPitch));
         soccerPitchScheduleMapper.update(soccerPitch);
     }
 
     private void insertSchedule(LCSDSoccerPitchSchedule soccerPitch) {
-        setStatusCode(soccerPitch);
+        checkStatusCode(soccerPitch);
         System.out.println("Schedule inserted: " + formatSchedule(soccerPitch));
         soccerPitchScheduleMapper.insert(soccerPitch);
     }
 
-    private void setStatusCode(LCSDSoccerPitchSchedule soccerPitch) {
+    private void checkStatusCode(LCSDSoccerPitchSchedule soccerPitch) {
         if (StringUtils.equals(soccerPitch.getAvailable_courts(), "0")) {
             soccerPitch.setStatus_code("FULL_BOOKING");
         } else {
@@ -152,7 +157,7 @@ public class SyncLCSDSoccerPitchCronJob {
         List<LCSDSoccerPitchSchedule> houseKeepSchedules = soccerPitchScheduleMapper.getHouseKeepLCSDSoccerPitchSchedule();
         for (LCSDSoccerPitchSchedule soccerPitch : houseKeepSchedules) {
             if (isHousekeepingRequired(soccerPitch)) {
-                updateHousekeepingSchedule(soccerPitch);
+                runHouseKeep(soccerPitch);
             }
         }
     }
@@ -161,12 +166,18 @@ public class SyncLCSDSoccerPitchCronJob {
         return StringUtils.equals(soccerPitch.getStatus_code(), "AVALIABLE") || StringUtils.isEmpty(soccerPitch.getStatus_code());
     }
 
-    private void updateHousekeepingSchedule(LCSDSoccerPitchSchedule soccerPitch) {
+    private void runHouseKeep(LCSDSoccerPitchSchedule soccerPitch) {
         try {
             LocalDateTime inputDateTime = parseScheduleTime(soccerPitch);
             if (inputDateTime.isBefore(LocalDateTime.now())) {
                 soccerPitch.setAvailable_courts("0");
                 soccerPitch.setStatus_code("TIME_SLOT_STARTED");
+                // update booking records if not yet approved within the period
+                List<PSSUSBookingRecord> bookingRecords = pssusBookingMapper.getPSSUSBookingRecordByScheduleId(soccerPitch.getId());
+                for(PSSUSBookingRecord bookingRecord : bookingRecords) {
+                    bookingRecord.setStatus_code("TIME_SLOT_STARTED");
+                    pssusBookingMapper.updateStsCode(bookingRecord);
+                }
             } else {
                 soccerPitch.setStatus_code("AVALIABLE");
             }

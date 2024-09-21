@@ -1,4 +1,4 @@
-package com.hkust.isom5260.dto;
+package com.hkust.isom5260.model;
 
 import lombok.Getter;
 import lombok.Setter;

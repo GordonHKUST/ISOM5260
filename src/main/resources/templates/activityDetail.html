@@ -189,19 +189,22 @@ p{
         <div class="search-header">
             <h6 class="mb-0" style="margin-left: 7px;font-size:14px;">Booking Detail</h6>
         </div>
-        <form id="activityForm" name="activityForm" action="actReg" method="POST">
-        <input id="scheduleId" type="hidden" name="name" th:value="${scheduleId}" required/>
-        <div class="item">
+        <form id="activityForm" name="activityForm" th:action="${bookingRecord != null && bookingRecord.email != student.email ? 'actJoin' : 'actReg'}" method="POST">
+        <input id="scheduleId" type="hidden" name="name" th:value="${scheduleId}"/>
+        <input id="bookingRecordId" type="hidden" name="name" th:if="${bookingRecord != null}" th:value="${bookingRecord.booking_Id}"/>
+            <div class="item">
             <p>Host Name<span >*</span></p>
-            <div class="name-item">
-                <div th:if="${bookingRecord == null}">
+            <div th:if="${bookingRecord == null}">
+               <div class="name-item">
                 <input type="text" id="firstName" name="name" th:value="${student.firstName}" placeholder="First" disabled/>
                 <input type="text" id="lastName" name="name" th:value="${student.lastName}" placeholder="Last" disabled/>
-                </div>
+               </div>
             </div>
             <div th:if="${bookingRecord != null}">
+               <div class="name-item">
                 <input type="text" id="firstName" name="name" th:value="${bookingRecord.first_Name}" placeholder="First" disabled/>
                 <input type="text" id="lastName" name="name" th:value="${bookingRecord.last_Name}" placeholder="Last" disabled/>
+               </div>
             </div>
         </div>
         <div class="item">
@@ -242,7 +245,7 @@ p{
         </div>
             <div class="item">
                <p>Email<span >*</span></p>
-                  <div th:if="${bookingRecord == null}">
+                  <div th:if="${bookingRecord != null}">
                       <input id="email" type="email" th:value="${bookingRecord.email}" disabled/>
                   </div>
                   <div th:if="${bookingRecord == null}">
@@ -302,7 +305,7 @@ p{
         <div class="btn-block" th:if="${bookingRecord == null}">
             <button type="submit" id="apply">Apply</button>
         </div>
-        <div class="btn-block" th:if="${bookingRecord != null && bookingRecord.email != student.email}">
+        <div class="btn-block" th:if="${bookingRecord != null && bookingRecord.email != student.email && !isJoined}">
             <button type="submit" id="join">Join</button>
         </div>
         </form>
@@ -334,6 +337,7 @@ p{
         $('#activityForm').on('submit', function(event) {
             event.preventDefault();
             const activityForm = {
+                booking_Id :$('#bookingRecordId').val(),
                 first_Name: $('#firstName').val(),
                 last_Name: $('#lastName').val(),
                 student_Id: $('#studentId').val(),
@@ -350,7 +354,7 @@ p{
             console.log(JSON.stringify(activityForm));
             $.ajax({
                 type: 'POST',
-                url: '/actReg',
+                url: $(this).attr('action'),
                 contentType: 'application/json',
                 data: JSON.stringify(activityForm),
                 dataType: 'json',
@@ -358,19 +362,19 @@ p{
                     if (response.success) {
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Registration Success, please go back to home page.',
+                            text: response.message,
                             icon: 'success',
                             confirmButtonText: 'Return'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = '/users'; // Redirect to home page
+                                window.location.href = '/users';
                             }
                         });
                     } else {
                         Swal.fire({
-                            title: 'Fail!',
-                            text: 'Registration Fail, please check',
-                            icon: 'fail',
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error',
                             confirmButtonText: 'Return'
                         }).then((result) => {
                         });

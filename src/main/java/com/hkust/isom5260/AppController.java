@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
-import com.hkust.isom5260.dto.*;
+import com.hkust.isom5260.model.*;
 import com.hkust.isom5260.mapper.LCSDDistrictMapper;
 import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
 import com.hkust.isom5260.mapper.PSSUSBookingMapper;
@@ -63,20 +63,25 @@ public class AppController {
 			return "login";
 		}
 		boolean isBooking = false;
+		boolean isJoined = false;
 		USTStudent ustStudent = pssusUserMapper.selectByEmail(principal.getName());
 		model.addAttribute("student", ustStudent);
+		PSSUSBookingRecord bookingRecord = null;
 		if (bookingId != null) {
-            PSSUSBookingRecord bookingRecord =
-					pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
+			bookingRecord = pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
             id = Integer.valueOf(bookingRecord.getSchedule_id());
 			isBooking = true;
-			model.addAttribute("bookingRecord",bookingRecord);
+			if(pssusBookingMapper.getCountPSSUSBookingRecordByBookingId(String.valueOf(bookingId),ustStudent.getEmail()) > 0) {
+				isJoined = true;
+			}
 		}
 		List<LCSDSoccerPitchSchedule> schedules =
 				lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(id);
 		model.addAttribute("isBooking", isBooking);
 		model.addAttribute("scheduleId", id);
 		model.addAttribute("schedules", schedules.get(0));
+		model.addAttribute("bookingRecord",bookingRecord);
+		model.addAttribute("isJoined", isJoined);
 		return "activityDetail";
 	}
 
@@ -84,7 +89,7 @@ public class AppController {
 	@ResponseBody
 	public List<PSSUSBookingRecord> getRegisterActivity(Model model, Principal principal) {
 		String email = principal.getName();
-		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getPSSUSBookingRecordByEmail(email);
+		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getMyPSSUSBookingRecordByEmail(email);
 		for(PSSUSBookingRecord record : schedules) {
 			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
 					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
@@ -140,7 +145,7 @@ public class AppController {
 		pssusUserMapper.insert(USTStudent);
 		pssusUserMapper.insert_wallet(wallet);
 		return ResponseEntity.ok()
-				.body("{\"success\": true, \"message\": \"Registration successful\"}");
+				.body("{\"success\": true, \"message\": \"User Registration successful\"}");
 	}
 
 	private static USTStudentWallet populateNewStudentBalance(USTStudent USTStudent) {
@@ -149,6 +154,25 @@ public class AppController {
 		wallet.setLastMonthBalanceLeft(0);
 		wallet.setEmail(USTStudent.getEmail());
 		return wallet;
+	}
+
+	@PostMapping("/actJoin")
+	public ResponseEntity<?>  processActivityJoin(@RequestBody PSSUSBookingRecord record,
+												  Model model,
+												  BindingResult result ,
+												  HttpServletResponse response ,
+												  Principal principal) {
+		if (result.hasErrors()) {
+			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
+		} else {
+           PSSUSJoinBookingRecord joinBookingRecord = new PSSUSJoinBookingRecord();
+		   joinBookingRecord.setBooking_record_id(record.getBooking_Id());
+		   USTStudent joiner = pssusUserMapper.selectByEmail(principal.getName());
+		   joinBookingRecord.setJoiner_email(joiner.getEmail());
+		   joinBookingRecord.setJoiner_student_id(joiner.getStudentId());
+		   pssusBookingMapper.insertJoinRecord(joinBookingRecord);
+		   return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Join successful\"}");
+		}
 	}
 
 	@PostMapping("/actReg")
@@ -169,9 +193,9 @@ public class AppController {
 				lcsdSoccerPitchScheduleMapper.update(lcsdSoccerPitchSchedule);
 			}
 			record.setStatus_code("PENDING_APPROVAL");
-			pssusBookingMapper.insert(record);
+			pssusBookingMapper.insertBookingRecord(record);
 		}
-		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Registration successful\"}");
+		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Registration successful\"}");
 	}
 
 	@GetMapping("/triggerReport")
@@ -193,7 +217,7 @@ public class AppController {
 		   }
 		model.addAttribute("user", principal.getName());
 		model.addAttribute("avaliableSoccerSize",lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
-		model.addAttribute("youreventsize",pssusBookingMapper.getPSSUSBookingRecordByEmail(principal.getName()).size());
+		model.addAttribute("youreventsize",pssusBookingMapper.getMyPSSUSBookingRecordByEmail(principal.getName()).size());
 		return "greeting";
 	}
 
@@ -211,5 +235,4 @@ public class AppController {
 		}
 		return "index";
 	}
-
 }

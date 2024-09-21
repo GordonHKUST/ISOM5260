@@ -1,7 +1,7 @@
 package com.hkust.isom5260.service;
 
-import com.hkust.isom5260.dto.CustomUserDetails;
-import com.hkust.isom5260.dto.USTStudent;
+import com.hkust.isom5260.model.CustomUserDetails;
+import com.hkust.isom5260.model.USTStudent;
 import com.hkust.isom5260.mapper.PSSUSUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

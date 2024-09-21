@@ -1,6 +1,6 @@
 package com.hkust.isom5260.mapper;
 
-import com.hkust.isom5260.dto.LCSDDistrict;
+import com.hkust.isom5260.model.LCSDDistrict;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
