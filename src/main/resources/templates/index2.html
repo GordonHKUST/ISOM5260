@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISOM5260 - Project</title>
+  <link rel="stylesheet" href="/style/style.css" />
+</head>
+<body>
+<div class="wrapper">
+  <form name="f" action="login" method="POST">
+    <div class="logo-image">
+      <img src="images/logo.png" alt=""  height="100px" width="500px"/><br/>
+    </div>
+    <h4>HKUST ISOM Club Public Soccer Sign Up System(PSSUS)</h4>
+    <h2>Login</h2>
+    <div th:if="${error}" th:text="${error}">
+
+    </div>
+    <div class="input-field">
+      <input id="email" name="email" type="text" required="true"/>
+      <label>Enter your email</label>
+    </div>
+    <div class="input-field">
+      <input id="password" name="password" type="password" required="true"/>
+      <label>Enter your password</label>
+    </div>
+    <button name="submit" type="submit" value="Login">Log In</button>
+    <div class="register">
+      <p>Don't have an account? <a href="/register">Register</a></p>
+    </div>
+  </form>
+</div>
+
+
+</body>
+</html>

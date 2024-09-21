@@ -113,14 +113,20 @@ public class AppController {
 	}
 
 	@PostMapping("/process_register")
-	public String processRegister(USTStudent USTStudent) {
+	public ResponseEntity<?> processRegister(USTStudent USTStudent ,  BindingResult result) {
+		if (result.hasErrors()) {
+			return ResponseEntity.badRequest()
+					.body("{\"success\": false, \"message\": " +
+							result.getFieldError().getRejectedValue() + "}");
+		}
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String encodedPassword = passwordEncoder.encode(USTStudent.getPassword());
 		USTStudent.setPassword(encodedPassword);
 		USTStudentWallet wallet = populateNewStudentBalance(USTStudent);
 		PSSUSUserMapper.insert(USTStudent);
 		PSSUSUserMapper.insert_wallet(wallet);
-		return "register_success";
+		return ResponseEntity.ok()
+				.body("{\"success\": true, \"message\": \"Registration successful\"}");
 	}
 
 	private static USTStudentWallet populateNewStudentBalance(USTStudent USTStudent) {
@@ -184,6 +190,7 @@ public class AppController {
 
 	@GetMapping({"","/login"})
 	public String login(Model model, @RequestParam(required = false) String error) {
+		model.addAttribute("user", new USTStudent());
         if(error != null &&
 				error.equals(String.valueOf(HttpStatus.UNAUTHORIZED.value()))) {
 			model.addAttribute("error",  HttpStatus.UNAUTHORIZED.value() + " : Bad Credentials");
