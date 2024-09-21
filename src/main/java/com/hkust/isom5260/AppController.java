@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AppController {
 	private static Properties properties = new Properties();
     @Autowired
-	private PSSUSUserMapper PSSUSUserMapper;
+	private PSSUSUserMapper pssusUserMapper;
 	@Autowired
 	private LCSDSoccerPitchScheduleMapper lcsdSoccerPitchScheduleMapper;
 	@Autowired
@@ -55,12 +55,6 @@ public class AppController {
 		}
 	}
 
-	@GetMapping("/register")
-	public String showRegistrationForm(Model model) {
-		model.addAttribute("user", new USTStudent());
-		return "signup_form";
-	}
-
 	@GetMapping("activityDetail")
 	public String activityDetail(Model model,@RequestParam(value="id",required = false) Integer id,
 								 @RequestParam(value="bookingId",required = false) Integer bookingId,
@@ -69,7 +63,7 @@ public class AppController {
 			return "login";
 		}
 		boolean isBooking = false;
-		USTStudent ustStudent = PSSUSUserMapper.selectByEmail(principal.getName());
+		USTStudent ustStudent = pssusUserMapper.selectByEmail(principal.getName());
 		model.addAttribute("student", ustStudent);
 		if (bookingId != null) {
             PSSUSBookingRecord bookingRecord =
@@ -94,6 +88,27 @@ public class AppController {
 		for(PSSUSBookingRecord record : schedules) {
 			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
 					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
+			USTStudent registStudent = pssusUserMapper.selectByEmail(record.getEmail());
+			record.setFirst_Name(registStudent.getFirstName());
+			record.setLast_Name(registStudent.getLastName());
+			record.setEmail(registStudent.getEmail());
+			record.setSession_start_time(schedule.getSession_start_time());
+			record.setSession_end_time(schedule.getSession_end_time());
+			record.setAvailable_date(schedule.getAvailable_date());
+			record.setVenue_Name_En(schedule.getVenue_name_en());
+		}
+		return schedules;
+	}
+
+
+	@GetMapping("getOtherRegisterActivity")
+	@ResponseBody
+	public List<PSSUSBookingRecord> getOtherRegisterActivity(Model model, Principal principal) {
+		String email = principal.getName();
+		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getOtherActivePSSUSBookingRecord(email);
+		for(PSSUSBookingRecord record : schedules) {
+			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
+					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
 			record.setSession_start_time(schedule.getSession_start_time());
 			record.setSession_end_time(schedule.getSession_end_time());
 			record.setAvailable_date(schedule.getAvailable_date());
@@ -106,9 +121,8 @@ public class AppController {
 	public String searchPanel(Model model,Principal principal) {
 		List<LCSDDistrict> lcsdDistricts = districtMapper.selectDistrictFromSchedule();
 		model.addAttribute("districts", lcsdDistricts);
-		// do it in last step
-		//USTStudent ustStudent = userMapper.selectByEmail(principal.getName());
-		//model.addAttribute("student" , ustStudent);
+		USTStudent ustStudent = pssusUserMapper.selectByEmail(principal.getName());
+		model.addAttribute("student" , ustStudent.getEmail());
 		return "searchPanel";
 	}
 
@@ -123,8 +137,8 @@ public class AppController {
 		String encodedPassword = passwordEncoder.encode(USTStudent.getPassword());
 		USTStudent.setPassword(encodedPassword);
 		USTStudentWallet wallet = populateNewStudentBalance(USTStudent);
-		PSSUSUserMapper.insert(USTStudent);
-		PSSUSUserMapper.insert_wallet(wallet);
+		pssusUserMapper.insert(USTStudent);
+		pssusUserMapper.insert_wallet(wallet);
 		return ResponseEntity.ok()
 				.body("{\"success\": true, \"message\": \"Registration successful\"}");
 	}

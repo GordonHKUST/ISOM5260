@@ -81,7 +81,7 @@
 					<div class="form-group">
 					   <div class="input-field">
 						   <i class="fas fa-id-card"></i>
-					   	   <input type="text" th:field="*{studentId}" class="form-control" placeholder="Student ID" required="true" max="10"/>
+					   	   <input type="text" th:field="*{studentId}" class="form-control" placeholder="SID" required="true" max="10"/>
 					   </div>
 					   <div class="input-field">
 						   <i class="fas fa-phone"></i>
@@ -89,12 +89,14 @@
 					   </div>
 					   <div class="input-field">
 						   <i class="fas fa-book"></i>
-					   	   <input type="text" th:field="*{studyYear}" class="form-control" placeholder="Study Year" required="true" max="2" />
+					   	   <input type="text" th:field="*{studyYear}" class="form-control" placeholder="Year" required="true" max="2" />
 					   </div>
-					   <div class="input-field">
-						   <i class="fas fa-calendar-alt"></i>
-					   	   <input type="text" th:field="*{program}" class="form-control" placeholder="Program Name" required="true" min="8" max="8"/>
-					   </div>
+					</div>
+					<p><b>Program</b></p>
+					<div class="form-group">
+					    <input type="radio" th:field="*{program}" value="MSCISM" required="true" placeholder="MSCISM"/><span>MSCISM</span> &nbsp;&nbsp;&nbsp;
+					    <input type="radio" th:field="*{program}" value="MSCGO" required="true" /><span>MSCGO</span> &nbsp;&nbsp;&nbsp;
+						<input type="radio" th:field="*{program}" value="MSCBA" required="true" /><span>MSCBA</span> &nbsp;&nbsp;&nbsp;
 					</div>
 					<input type="submit" class="btn" value="Sign up" />
 				</form>
@@ -107,7 +109,7 @@
 					<h3>New here ?</h3>
 					<p>
 						Join HKUST ISOM Club PSSUS , more than 500 soccer pitches which under management of LCSD schedule awaits you for register.
-						3000 Free Credits will be gained for New Member.
+						3000 Credits will be gained for Member each month. 1 Credit = 1 HKD
 					</p>
 					<button class="btn transparent" id="sign-up-btn">
 						Sign up

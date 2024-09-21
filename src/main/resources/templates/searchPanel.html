@@ -65,7 +65,7 @@
         <ul class="logout-mode">
             <li><a href="#">
                 <i class="uil uil-user"></i>
-                <span class="link-name" th:text="${user}"></span>
+                <span class="link-name" th:text="${student}"></span>
             </a></li>
             <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -75,16 +75,6 @@
                 <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
                     <input type="hidden" name="_method" value="post" />
                 </form>
-            </li>
-            <li class="mode">
-                <a href="#">
-                    <i class="uil uil-moon"></i>
-                    <span class="link-name">Dark Mode</span>
-                </a>
-
-                <div class="mode-toggle">
-                    <span class="switch"></span>
-                </div>
             </li>
         </ul>
     </div>

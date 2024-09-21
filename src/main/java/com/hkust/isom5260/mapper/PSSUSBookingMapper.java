@@ -22,6 +22,10 @@ public interface PSSUSBookingMapper {
     @Select("Select * from PSSUS_Booking_Record WHERE email = #{email}")
     List<PSSUSBookingRecord> getPSSUSBookingRecordByEmail(String email);
 
+    @Select("Select * from PSSUS_Booking_Record WHERE email != #{email} " +
+            "and status_code = 'PENDING_APPROVAL'")
+    List<PSSUSBookingRecord> getOtherActivePSSUSBookingRecord(String email);
+
     @Select("Select * from UST_STUDENT_WALLET WHERE email = #{email}")
     List<USTStudentWallet> getUSTStudentWalletByEmail(String email);
 

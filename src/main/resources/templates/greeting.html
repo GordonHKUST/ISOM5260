@@ -99,6 +99,28 @@
     <div class="activity">
       <div class="title">
         <i class="uil uil-clock-three"></i>
+        <span class="text">Other PPL Not Approved Campaign</span>
+      </div>
+    </div>
+    <div class="activity-data">
+      <table id="otherCampaign" class="table table-striped">
+        <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Campaign Detail</th>
+          <th>Schedule Available Date</th>
+          <th>Schedule Location</th>
+          <th>Schedule Start Time</th>
+          <th>Schedule End Time</th>
+          <th>Activity Status</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="title">
+        <i class="uil uil-clock-three"></i>
         <span class="text">My Recent Created Campaign</span>
       </div>
     </div>
@@ -145,6 +167,38 @@
 
 <script>
   $(document).ready(function() {
+    $('#otherCampaign').DataTable({
+      "sAjaxSource": "/getOtherRegisterActivity",
+      "sAjaxDataProp": "",
+      "order": [[ 0, "asc" ]],
+      "columns": [
+        { "data": "booking_Id"},
+        { "data": "campaign_Detail"},
+        { "data": "available_date"},
+        { "data": "venue_Name_En"},
+        { "data": "session_start_time"},
+        { "data": "session_end_time"},
+        { "data": "status_code"}
+      ],
+      "columnDefs": [
+        {
+          "targets": 0,
+          "render": function(data, type, row) {
+            return `<a href="/activityDetail?bookingId=${data}">Click</a>`;
+          }
+        }
+      ],
+      responsive: {
+        details: false
+      },
+      layout: {
+        top1: {
+          searchPanes: {
+            viewTotal: true
+          }
+        }
+      }
+    });
 
     $('#myActivity').DataTable({
       "sAjaxSource": "/getRegisterActivity",
@@ -167,6 +221,9 @@
           }
         }
       ],
+      responsive: {
+        details: false
+      },
       layout: {
         top1: {
           searchPanes: {
@@ -197,6 +254,9 @@
           }
         }
       ],
+      responsive: {
+        details: false
+      },
       layout: {
         top1: {
           searchPanes: {

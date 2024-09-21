@@ -169,7 +169,7 @@ p{
         <ul class="logout-mode">
             <li><a href="#">
                 <i class="uil uil-user"></i>
-                <span class="link-name" th:text="${user}"></span>
+                <span class="link-name" th:text="${student.email}"></span>
             </a></li>
             <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -194,8 +194,14 @@ p{
         <div class="item">
             <p>Host Name<span >*</span></p>
             <div class="name-item">
+                <div th:if="${bookingRecord == null}">
                 <input type="text" id="firstName" name="name" th:value="${student.firstName}" placeholder="First" disabled/>
                 <input type="text" id="lastName" name="name" th:value="${student.lastName}" placeholder="Last" disabled/>
+                </div>
+            </div>
+            <div th:if="${bookingRecord != null}">
+                <input type="text" id="firstName" name="name" th:value="${bookingRecord.first_Name}" placeholder="First" disabled/>
+                <input type="text" id="lastName" name="name" th:value="${bookingRecord.last_Name}" placeholder="Last" disabled/>
             </div>
         </div>
         <div class="item">
@@ -235,9 +241,14 @@ p{
             </div>
         </div>
             <div class="item">
-            <p>Email<span >*</span></p>
-            <input id="email" type="email" th:value="${student.email}" disabled/>
-            </div>
+               <p>Email<span >*</span></p>
+                  <div th:if="${bookingRecord == null}">
+                      <input id="email" type="email" th:value="${bookingRecord.email}" disabled/>
+                  </div>
+                  <div th:if="${bookingRecord == null}">
+                      <input id="email" type="email" th:value="${student.email}" disabled/>
+                  </div>
+               </div>
             <div class="item">
               <p>Contact Phone<span >*</span></p>
                 <div th:if="${bookingRecord != null}">
@@ -289,51 +300,19 @@ p{
             </div>
         </div>
         <div class="btn-block" th:if="${bookingRecord == null}">
-            <button type="submit" >Apply</button>
+            <button type="submit" id="apply">Apply</button>
+        </div>
+        <div class="btn-block" th:if="${bookingRecord != null && bookingRecord.email != student.email}">
+            <button type="submit" id="join">Join</button>
         </div>
         </form>
     </div>
 </section>
 </body>
-    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">Registration Success</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="modalBody">
-                    Your registration has been successfully completed!
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="redirectButton">Go to Users</button>
-                </div>
-            </div>
-        </div>
-    </div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-<div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-<div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="modalLabel">Success</h5>
-        </div>
-        <div class="modal-body">
-            Registration Success , please go back to home page.
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="goHomeButton">Return</button>
-        </div>
-    </div>
-</div>
-</div>
-
 <script th:inline="javascript">
     function initMap() {
         const latitude = parseFloat([[${schedules.venue_latitude}]]);
@@ -377,32 +356,43 @@ p{
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        $('#returnModal').modal('show');
-                        //window.location.href = '/users';
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Registration Success, please go back to home page.',
+                            icon: 'success',
+                            confirmButtonText: 'Return'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/users'; // Redirect to home page
+                            }
+                        });
                     } else {
-                        $('#alertContainer').html(`
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>Error!</strong> Something went wrong.
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        `);
+                        Swal.fire({
+                            title: 'Fail!',
+                            text: 'Registration Fail, please check',
+                            icon: 'fail',
+                            confirmButtonText: 'Return'
+                        }).then((result) => {
+                        });
                     }
                 },
                 error: function() {
-                    $('#message').text('Registration failed');
+                    Swal.fire({
+                        title: 'Fail!',
+                        text: 'Registration Fail, please check',
+                        icon: 'fail',
+                        confirmButtonText: 'Return'
+                    }).then((result) => {
+                    });
                 }
             });
-        });
-        $('#goHomeButton').click(function() {
-            // Redirect to home page
-            window.location.href = '/users'; // Change this to your home page URL
         });
     });
 
 
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="script.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnbMnePbkia7Uu2PeRoHf9V3gHKqmKYks"></script>
 </html>

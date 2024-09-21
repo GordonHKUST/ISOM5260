@@ -32,4 +32,6 @@ public class PSSUSBookingRecord {
     private String session_end_time;
     private String available_date;
     private String venue_Name_En;
+    private String last_Name;
+    private String first_Name;
 }
