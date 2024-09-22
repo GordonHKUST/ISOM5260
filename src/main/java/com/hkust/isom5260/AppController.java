@@ -181,17 +181,6 @@ public class AppController {
 		if (result.hasErrors()) {
 			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
 		} else {
-			LCSDSoccerPitchSchedule lcsdSoccerPitchSchedule =
-					lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
-			int avaliableCount = Integer.valueOf(lcsdSoccerPitchSchedule.getAvailable_courts()) - 1;
-			if(avaliableCount <= 0) {
-				lcsdSoccerPitchSchedule.setAvailable_courts(String.valueOf(0));
-				lcsdSoccerPitchSchedule.setStatus_code("FULL_BOOKING");
-				lcsdSoccerPitchScheduleMapper.update(lcsdSoccerPitchSchedule);
-			} else {
-				lcsdSoccerPitchSchedule.setAvailable_courts(String.valueOf(avaliableCount));
-				lcsdSoccerPitchScheduleMapper.update(lcsdSoccerPitchSchedule);
-			}
 			record.setStatus_code("PENDING_APPROVAL");
 			pssusBookingMapper.insertBookingRecord(record);
 		}
