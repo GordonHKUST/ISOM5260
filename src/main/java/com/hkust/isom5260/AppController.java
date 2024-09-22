@@ -69,7 +69,10 @@ public class AppController {
 		PSSUSBookingRecord bookingRecord = null;
 		if (bookingId != null) {
 			bookingRecord = pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
-            id = Integer.valueOf(bookingRecord.getSchedule_id());
+			USTStudent host = pssusUserMapper.selectByEmail(bookingRecord.getEmail());
+			bookingRecord.setLast_Name(host.getLastName());
+			bookingRecord.setFirst_Name(host.getFirstName());
+					id = Integer.valueOf(bookingRecord.getSchedule_id());
 			isBooking = true;
 			if(pssusBookingMapper.getCountPSSUSBookingRecordByBookingId(String.valueOf(bookingId),ustStudent.getEmail()) > 0) {
 				isJoined = true;
