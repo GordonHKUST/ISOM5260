@@ -66,6 +66,10 @@ public interface LCSDSoccerPitchScheduleMapper {
             " WHERE venue_name_en = #{venue_name_en} AND available_date = #{available_date} AND session_start_time = #{session_start_time}")
     void update(LCSDSoccerPitchSchedule soccerPitch);
 
+    @Update(" SELECT * FROM LCSD_SOCCER_PITCH_SCHEDULE\n" +
+            " WHERE venue_name_en = #{venue_name_en} AND available_date = #{available_date} AND session_start_time = #{session_start_time}")
+    LCSDSoccerPitchSchedule selectOne(LCSDSoccerPitchSchedule soccerPitch);
+
     @Select("Select * from LCSD_SOCCER_PITCH_SCHEDULE WHERE id = #{id}")
     List<LCSDSoccerPitchSchedule> getLCSDSoccerPitchScheduleById(int id);
 
@@ -76,9 +80,6 @@ public interface LCSDSoccerPitchScheduleMapper {
 
     @Select("    SELECT LCSD_SOCCER_PITCH_SCHEDULE.* \n" +
             "    FROM LCSD_SOCCER_PITCH_SCHEDULE \n" +
-            "    WHERE status_code = 'AVALIABLE' OR status_code is null")
+            "    WHERE status_code = 'AVALIABLE' OR status_code = 'FULL_BOOKING'  OR status_code is null")
     List<LCSDSoccerPitchSchedule> getHouseKeepLCSDSoccerPitchSchedule();
-
-
-
 }

@@ -22,7 +22,7 @@ public interface PSSUSBookingMapper {
             "(booking_join_seq.NEXTVAL,#{booking_record_id},#{joiner_student_id},#{joiner_email})")
     void insertJoinRecord(PSSUSJoinBookingRecord bookingRecord);
 
-    @Update("UPDATE PSSUS_Booking_Record SET status_code = #{status_code} where schedule_id = #{schedule_id} ")
+    @Update("UPDATE PSSUS_Booking_Record SET status_code = #{status_code} where booking_Id = #{booking_Id} ")
     void updateStsCode(PSSUSBookingRecord bookingRecord);
 
     @Select("SELECT * from PSSUS_Booking_Record pbr " +
@@ -31,12 +31,16 @@ public interface PSSUSBookingMapper {
             "WHERE pbr.email = #{email} OR jbr.joiner_email = #{email} ")
     List<PSSUSBookingRecord> getMyPSSUSBookingRecordByEmail(String email);
 
-    @Select("SELECT * from PSSUS_Booking_Record pbr " +
-            "LEFT JOIN PSSUS_JOIN_BOOKING_RECORD jbr " +
-            "ON pbr.booking_id = jbr.booking_record_id " +
-            "WHERE pbr.email != #{email} " +
-            "AND status_code = 'PENDING_APPROVAL' " +
-            "AND (jbr.joiner_email IS NULL OR jbr.joiner_email != #{email})" )
+    @Select("SELECT *\n" +
+            "FROM PSSUS_Booking_Record pbr\n" +
+            "JOIN PSSUS_JOIN_BOOKING_RECORD jbr ON pbr.booking_id = jbr.booking_record_id\n" +
+            "WHERE status_code = 'PENDING_APPROVAL'\n" +
+            "AND pbr.email != #{email}\n" +
+            "AND NOT EXISTS (\n" +
+            "    SELECT 1\n" +
+            "    FROM PSSUS_JOIN_BOOKING_RECORD jbr2\n" +
+            "    WHERE jbr2.joiner_email = #{email} and jbr2.booking_record_id != jbr.booking_record_id\n" +
+            ")")
     List<PSSUSBookingRecord> getOtherActivePSSUSBookingRecord(String email);
 
     @Select("SELECT * from UST_STUDENT_WALLET WHERE email = #{email}")
@@ -48,6 +52,6 @@ public interface PSSUSBookingMapper {
     @Select("SELECT count(1) from PSSUS_JOIN_BOOKING_RECORD WHERE BOOKING_RECORD_ID = #{booking_Id} AND JOINER_EMAIL = #{joiner_email}")
     int getCountPSSUSBookingRecordByBookingId(@Param("booking_Id") String booking_Id, @Param("joiner_email")String joiner_email);
 
-    @Select("Select * from PSSUS_Booking_Record WHERE schedule_Id = #{booking_Id}")
-    List<PSSUSBookingRecord> getPSSUSBookingRecordByScheduleId(String booking_Id);
+    @Select("Select * from PSSUS_Booking_Record WHERE schedule_Id = #{schedule_Id}")
+    List<PSSUSBookingRecord> getPSSUSBookingRecordByScheduleId(String schedule_Id);
 }
