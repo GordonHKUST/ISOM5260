@@ -129,11 +129,8 @@ public class SyncLCSDSoccerPitchCronJob {
 
     private void updateSchedule(LCSDSoccerPitchSchedule soccerPitch) {
         reviewStsCode(soccerPitch);
-        LCSDSoccerPitchSchedule oldSoccerPitch = soccerPitchScheduleMapper.select(soccerPitch).get(0);
-        if (!StringUtils.equals(oldSoccerPitch.getStatus_code(), soccerPitch.getStatus_code())) {
-            System.out.println("Schedule updated: " + formatSchedule(soccerPitch));
-            soccerPitchScheduleMapper.update(soccerPitch);
-        }
+        System.out.println("Schedule updated: " + formatSchedule(soccerPitch));
+        soccerPitchScheduleMapper.update(soccerPitch);
     }
 
     private void insertSchedule(LCSDSoccerPitchSchedule soccerPitch) {
