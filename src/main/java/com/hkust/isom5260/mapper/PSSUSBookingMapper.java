@@ -31,15 +31,16 @@ public interface PSSUSBookingMapper {
             "WHERE pbr.email = #{email} OR jbr.joiner_email = #{email} ")
     List<PSSUSBookingRecord> getMyPSSUSBookingRecordByEmail(String email);
 
-    @Select("SELECT *\n" +
+    @Select("SELECT DISTINCT *\n" +
             "FROM PSSUS_Booking_Record pbr\n" +
-            "JOIN PSSUS_JOIN_BOOKING_RECORD jbr ON pbr.booking_id = jbr.booking_record_id\n" +
+            "LEFT JOIN PSSUS_JOIN_BOOKING_RECORD jbr ON pbr.booking_id = jbr.booking_record_id\n" +
             "WHERE status_code = 'PENDING_APPROVAL'\n" +
             "AND pbr.email != #{email}\n" +
             "AND NOT EXISTS (\n" +
             "    SELECT 1\n" +
             "    FROM PSSUS_JOIN_BOOKING_RECORD jbr2\n" +
-            "    WHERE jbr2.joiner_email = #{email} and jbr2.booking_record_id != jbr.booking_record_id\n" +
+            "    WHERE jbr2.joiner_email = #{email}\n" +
+            "    AND jbr2.booking_record_id = pbr.booking_id\n" +
             ")")
     List<PSSUSBookingRecord> getOtherActivePSSUSBookingRecord(String email);
 

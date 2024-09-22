@@ -68,7 +68,7 @@ public interface LCSDSoccerPitchScheduleMapper {
 
     @Update(" SELECT * FROM LCSD_SOCCER_PITCH_SCHEDULE\n" +
             " WHERE venue_name_en = #{venue_name_en} AND available_date = #{available_date} AND session_start_time = #{session_start_time}")
-    LCSDSoccerPitchSchedule selectOne(LCSDSoccerPitchSchedule soccerPitch);
+    List<LCSDSoccerPitchSchedule> select(LCSDSoccerPitchSchedule soccerPitch);
 
     @Select("Select * from LCSD_SOCCER_PITCH_SCHEDULE WHERE id = #{id}")
     List<LCSDSoccerPitchSchedule> getLCSDSoccerPitchScheduleById(int id);
