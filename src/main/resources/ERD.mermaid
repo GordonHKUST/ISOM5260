@@ -1,0 +1,97 @@
+erDiagram
+    ust_student_wallet ||--|{ ust_student_transaction : contains
+    lcsd_district ||--|{ lcsd_soccer_pitch_schedule : has
+    uststudent |{ -- o{ pssus_join_booking_record : joins
+    uststudent || -- o{ pssus_booking_record : makes
+    admin||--o{ pssus_booking_record: manage
+    lcsd_soccer_pitch_schedule ||--|{ pssus_booking_record : delegated
+    uststudent ||--|| ust_student_wallet : owned
+    pssus_booking_record ||--o{ pssus_join_booking_record :  can-have
+    pssus_booking_record ||--|{ ust_student_transaction : debits
+
+    ust_student_transaction {
+        NUMBER transaction_id PK
+        NUMBER wallet_id FK
+        NUMBER amount
+        VARCHAR2 transaction_type
+        VARCHAR2 transaction_description
+    }
+
+    lcsd_district {
+        NUMBER district_id PK
+        VARCHAR2 district_name_en
+        VARCHAR2 district_name_tc
+        VARCHAR2 district_shortform
+    }
+
+    lcsd_soccer_pitch_schedule {
+        NUMBER id PK
+        VARCHAR2 district_name_en
+        NVARCHAR2 district_name_tc
+        VARCHAR2 venue_name_en PK
+        NVARCHAR2 venue_name_tc
+        VARCHAR2 venue_address_en
+        NVARCHAR2 venue_address_tc
+        NUMBER venue_phone_no
+        NUMBER venue_longitude
+        NUMBER venue_latitude
+        VARCHAR2 facility_type_name_en
+        VARCHAR2 facility_type_name_tc
+        VARCHAR2 facility_location_name_en
+        VARCHAR2 facility_location_name_tc
+        VARCHAR2 available_date PK
+        TIME session_start_time PK
+        TIME session_end_time
+        NUMBER available_courts
+        VARCHAR2 status_code
+        NUMBER district_id FK
+    }
+
+    pssus_booking_record {
+        NUMBER booking_id PK
+        VARCHAR2 student_id
+        VARCHAR2 campaign_detail
+        VARCHAR2 campaign_remark
+        VARCHAR2 join_person
+        VARCHAR2 email FK
+        VARCHAR2 phone
+        VARCHAR2 personal_trainer
+        NUMBER schedule_id FK
+        VARCHAR2 status_code
+    }
+
+    pssus_join_booking_record {
+        VARCHAR2 booking_record_id FK
+        NUMBER join_id PK
+        VARCHAR2 joiner_student_id
+        VARCHAR2 joiner_email FK
+    }
+
+    ust_student_wallet {
+        NUMBER walletid PK
+        NUMBER currbalance
+        NUMBER lastmonthbalanceleft
+        VARCHAR2 email FK
+
+    }
+
+    uststudent {
+        NUMBER id PK
+        VARCHAR2 email PK
+        VARCHAR2 password
+        VARCHAR2 firstname
+        VARCHAR2 lastname
+        NUMBER studentid
+        NUMBER phone
+        NUMBER studyyear
+        VARCHAR2 walletid FK
+        VARCHAR2 program
+    }
+
+    admin {
+        NUMBER id PK
+        VARCHAR2 email PK
+        VARCHAR2 password
+        VARCHAR2 firstname
+        VARCHAR2 lastname
+    }
