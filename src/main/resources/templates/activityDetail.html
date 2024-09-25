@@ -317,6 +317,9 @@ p{
         <div class="btn-block" th:if="${bookingRecord != null && bookingRecord.email != student.email && !isJoined}">
             <button type="submit" id="join">Join</button>
         </div>
+        <div class="btn-block">
+            <button type="submit" id="backButton" style="background-color:grey;">Back Home</button>
+        </div>
         </form>
     </div>
 </section>
@@ -343,6 +346,14 @@ p{
     window.onload = initMap;
 
     $(document).ready(function() {
+
+
+        $('#backButton').click(function() {
+            // Redirect to the home page
+            window.location.href = '/users'; // Change this to your home page URL
+        });
+
+
         $('#activityForm').on('submit', function(event) {
             event.preventDefault();
             const activityForm = {

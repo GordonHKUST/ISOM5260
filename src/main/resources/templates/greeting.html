@@ -6,12 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <link rel="stylesheet" href="style.css"/>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.6/css/responsive.dataTables.min.css">
+  <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+
   <link type="text/css" rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css}" />
   <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/searchpanes/2.3.2/css/searchPanes.dataTables.css}" />
   <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/select/2.1.0/css/select.dataTables.css}" />
   <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css}" />
-  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"/>
 
@@ -188,9 +192,7 @@
           }
         }
       ],
-      responsive: {
-        details: false
-      },
+      responsive:true,
       layout: {
         top1: {
           searchPanes: {
@@ -221,9 +223,7 @@
           }
         }
       ],
-      responsive: {
-        details: false
-      },
+      responsive: true,
       layout: {
         top1: {
           searchPanes: {
@@ -254,9 +254,7 @@
           }
         }
       ],
-      responsive: {
-        details: false
-      },
+      responsive: true,
       layout: {
         top1: {
           searchPanes: {

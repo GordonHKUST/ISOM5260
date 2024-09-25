@@ -81,25 +81,28 @@
 					<div class="form-group">
 					   <div class="input-field">
 						   <i class="fas fa-id-card"></i>
-					   	   <input type="text" th:field="*{studentId}" class="form-control" placeholder="SID" required="true" max="10"/>
+					   	   <input type="text" th:field="*{studentId}" class="form-control" placeholder="&nbsp;&nbsp;&nbsp;SID" required="true" max="10"/>
 					   </div>
 					   <div class="input-field">
 						   <i class="fas fa-phone"></i>
-					   	   <input type="text" th:field="*{phone}" class="form-control" placeholder="Phone" required="true" min="8" max="8"/>
+					   	   <input type="text" th:field="*{phone}" class="form-control" placeholder="&nbsp;&nbsp;&nbsp;Phone" required="true" min="8" max="8"/>
 					   </div>
 					   <div class="input-field">
 						   <i class="fas fa-book"></i>
-					   	   <input type="text" th:field="*{studyYear}" class="form-control" placeholder="Year" required="true" max="2" />
+					   	   <input type="text" th:field="*{studyYear}" class="form-control" placeholder="&nbsp;&nbsp;&nbsp;Year" required="true" max="2" />
 					   </div>
 					</div>
 					<p><b>Program</b></p>
 					<div class="form-group">
-					    <input type="radio" th:field="*{program}" value="MSCISM" required="true" placeholder="MSCISM"/><span>MSCISM</span> &nbsp;&nbsp;&nbsp;
-					    <input type="radio" th:field="*{program}" value="MSCGO" required="true" /><span>MSCGO</span> &nbsp;&nbsp;&nbsp;
-						<input type="radio" th:field="*{program}" value="MSCBA" required="true" /><span>MSCBA</span> &nbsp;&nbsp;&nbsp;
-						<input type="radio" th:field="*{program}" value="BBAIM" required="true" /><span>BBAIM</span> &nbsp;&nbsp;&nbsp;
-						<input type="radio" th:field="*{program}" value="MBA" required="true" /><span>MBA</span> &nbsp;&nbsp;&nbsp;
-					</div>
+							<select id="program" th:field="*{program}" required="true">
+								<option value="" disabled selected>Select a program</option>
+								<option value="MSCISM">MSCISM</option>
+								<option value="MSCGO">MSCGO</option>
+								<option value="MSCBA">MSCBA</option>
+								<option value="BBAIM">BBAIM</option>
+								<option value="MBA">MBA</option>
+							</select>
+				    </div>
 					<p class="social-text"><b>Disclaimer</b>: Upon each activity/campaign created by your account, our staff will directly help program registration to LCSD. We urge you to carefully consider your decision, as results are final and cannot be reversed. Payments made will be directed to LCSD and are non-refundable. Thank you for your attention.</p>
 					<input type="submit" class="btn" value="Sign up" />
 				</form>
@@ -134,13 +137,15 @@
 			</div>
 		</div>
 	</div>
-	<script src="app.js"></script>
 </body>
 <script src="script_index.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script>
 	$(document).ready(function() {
+		$('#program').select2();
 		$('#signupForm').on('submit', function(event) {
 			event.preventDefault();
 			$.ajax({
