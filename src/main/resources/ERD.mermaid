@@ -1,97 +1,89 @@
 erDiagram
-    ust_student_wallet ||--|{ ust_student_transaction : contains
-    lcsd_district ||--|{ lcsd_soccer_pitch_schedule : has
-    uststudent |{ -- o{ pssus_join_booking_record : joins
-    uststudent || -- o{ pssus_booking_record : makes
-    admin||--o{ pssus_booking_record: manage
-    lcsd_soccer_pitch_schedule ||--|{ pssus_booking_record : delegated
-    uststudent ||--|| ust_student_wallet : owned
-    pssus_booking_record ||--o{ pssus_join_booking_record :  can-have
-    pssus_booking_record ||--|{ ust_student_transaction : debits
+    UST_STUDENT_WALLET ||--|{ UST_STUDENT_TRANSACTION : COLLECTS
+    LCSD_DISTRICT ||--|{ LCSD_SOCCER_PITCH_SCHEDULE : HAS
+    USTSTUDENT |{ -- o{ PSSUS_JOIN_BOOKING_RECORD : JOINS
+    USTSTUDENT || -- o{ PSSUS_BOOKING_RECORD : MAKES
+    ADMIN ||--o{ PSSUS_BOOKING_RECORD : MANAGE
+    LCSD_SOCCER_PITCH_SCHEDULE ||--|{ PSSUS_BOOKING_RECORD : DELEGATED
+    USTSTUDENT ||--|| UST_STUDENT_WALLET : OWNED
+    PSSUS_BOOKING_RECORD ||--o{ PSSUS_JOIN_BOOKING_RECORD : CAN_HAVE
+    PSSUS_BOOKING_RECORD ||--|{ UST_STUDENT_TRANSACTION : DEBITS
 
-    ust_student_transaction {
-        NUMBER transaction_id PK
-        NUMBER wallet_id FK
-        NUMBER amount
-        VARCHAR2 transaction_type
-        VARCHAR2 transaction_description
+    UST_STUDENT_TRANSACTION {
+        NUMBER TRANSACTION_ID PK
+        NUMBER WALLET_ID FK
+        NUMBER AMOUNT
+        VARCHAR2 TRANSACTION_TYPE
+        VARCHAR2 TRANSACTION_DESCRIPTION
     }
-
-    lcsd_district {
-        NUMBER district_id PK
-        VARCHAR2 district_name_en
-        VARCHAR2 district_name_tc
-        VARCHAR2 district_shortform
+    LCSD_DISTRICT {
+        NUMBER DISTRICT_ID PK
+        VARCHAR2 DISTRICT_NAME_EN
+        VARCHAR2 DISTRICT_NAME_TC
+        VARCHAR2 DISTRICT_SHORTFORM
     }
-
-    lcsd_soccer_pitch_schedule {
-        NUMBER id PK
-        VARCHAR2 district_name_en
-        NVARCHAR2 district_name_tc
-        VARCHAR2 venue_name_en PK
-        NVARCHAR2 venue_name_tc
-        VARCHAR2 venue_address_en
-        NVARCHAR2 venue_address_tc
-        NUMBER venue_phone_no
-        NUMBER venue_longitude
-        NUMBER venue_latitude
-        VARCHAR2 facility_type_name_en
-        VARCHAR2 facility_type_name_tc
-        VARCHAR2 facility_location_name_en
-        VARCHAR2 facility_location_name_tc
-        VARCHAR2 available_date PK
-        TIME session_start_time PK
-        TIME session_end_time
-        NUMBER available_courts
-        VARCHAR2 status_code
-        NUMBER district_id FK
+    LCSD_SOCCER_PITCH_SCHEDULE {
+        NUMBER ID PK
+        VARCHAR2 DISTRICT_NAME_EN
+        NVARCHAR2 DISTRICT_NAME_TC
+        VARCHAR2 VENUE_NAME_EN PK
+        NVARCHAR2 VENUE_NAME_TC
+        VARCHAR2 VENUE_ADDRESS_EN
+        NVARCHAR2 VENUE_ADDRESS_TC
+        NUMBER VENUE_PHONE_NO
+        NUMBER VENUE_LONGITUDE
+        NUMBER VENUE_LATITUDE
+        VARCHAR2 FACILITY_TYPE_NAME_EN
+        VARCHAR2 FACILITY_TYPE_NAME_TC
+        VARCHAR2 FACILITY_LOCATION_NAME_EN
+        VARCHAR2 FACILITY_LOCATION_NAME_TC
+        VARCHAR2 AVAILABLE_DATE PK
+        VARCHAR2 SESSION_START_TIME PK
+        VARCHAR2 SESSION_END_TIME
+        NUMBER AVAILABLE_COURTS
+        VARCHAR2 STATUS_CODE
+        NUMBER DISTRICT_ID FK
     }
-
-    pssus_booking_record {
-        NUMBER booking_id PK
-        VARCHAR2 student_id
-        VARCHAR2 campaign_detail
-        VARCHAR2 campaign_remark
-        VARCHAR2 join_person
-        VARCHAR2 email FK
-        VARCHAR2 phone
-        VARCHAR2 personal_trainer
-        NUMBER schedule_id FK
-        VARCHAR2 status_code
+    PSSUS_BOOKING_RECORD {
+        NUMBER BOOKING_ID PK
+        VARCHAR2 STUDENT_ID
+        VARCHAR2 CAMPAIGN_DETAIL
+        VARCHAR2 CAMPAIGN_REMARK
+        VARCHAR2 JOIN_PERSON
+        VARCHAR2 EMAIL FK
+        VARCHAR2 PHONE
+        VARCHAR2 PERSONAL_TRAINER
+        NUMBER SCHEDULE_ID PK,FK
+        VARCHAR2 STATUS_CODE
     }
-
-    pssus_join_booking_record {
-        VARCHAR2 booking_record_id FK
-        NUMBER join_id PK
-        VARCHAR2 joiner_student_id
-        VARCHAR2 joiner_email FK
+    PSSUS_JOIN_BOOKING_RECORD {
+        NUMBER JOIN_ID PK
+        VARCHAR2 BOOKING_RECORD_ID PK,FK
+        VARCHAR2 JOINER_STUDENT_ID
+        VARCHAR2 JOINER_EMAIL FK
     }
-
-    ust_student_wallet {
-        NUMBER walletid PK
-        NUMBER currbalance
-        NUMBER lastmonthbalanceleft
-        VARCHAR2 email FK
-
+    UST_STUDENT_WALLET {
+        NUMBER WALLETID PK
+        NUMBER CURRBALANCE
+        NUMBER LASTMONTHBALANCELEFT
+        VARCHAR2 EMAIL FK
     }
-
-    uststudent {
-        NUMBER id PK
-        VARCHAR2 email PK
-        VARCHAR2 password
-        VARCHAR2 firstname
-        VARCHAR2 lastname
-        NUMBER studentid
-        NUMBER phone
-        NUMBER studyyear
-        VARCHAR2 walletid FK
-        VARCHAR2 program
+    USTSTUDENT {
+        NUMBER ID PK
+        VARCHAR2 EMAIL PK
+        VARCHAR2 PASSWORD 
+        VARCHAR2 FIRSTNAME 
+        VARCHAR2 LASTNAME 
+        NUMBER STUDENTID
+        NUMBER PHONE
+        NUMBER STUDYYEAR
+        VARCHAR2 WALLETID FK
+        VARCHAR2 PROGRAM
     }
-
-    admin {
-        NUMBER id PK
-        VARCHAR2 email PK
-        VARCHAR2 password
-        VARCHAR2 firstname
-        VARCHAR2 lastname
+    ADMIN {
+        NUMBER ID PK
+        VARCHAR2 EMAIL PK
+        VARCHAR2 PASSWORD 
+        VARCHAR2 FIRSTNAME 
+        VARCHAR2 LASTNAME 
     }
