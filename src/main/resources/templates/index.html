@@ -25,6 +25,11 @@
 	.input-field {
 		margin-right: 10px !important;
 	}
+	button:disabled {
+		background-color: grey; /* Change background color to grey */
+		color: white;           /* Change text color to white */
+		cursor: not-allowed;    /* Change cursor to indicate it's disabled */
+	}
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,7 +108,7 @@
 								<option value="MBA">MBA</option>
 							</select>
 				    </div>
-					<p class="social-text"><b>Disclaimer</b>: Upon each activity/campaign created by your account, our staff will directly help program registration to LCSD. We urge you to carefully consider your decision, as results are final and cannot be reversed. Payments made will be directed to LCSD and are non-refundable. Thank you for your attention.</p>
+					<p class="social-text"><b>Disclaimer</b>:We urge you to carefully consider your decision, as results are final and cannot be reversed. Payments made are non-refundable. Thank you for your attention.</p>
 					<input type="submit" class="btn" value="Sign up" />
 				</form>
 			</div>
@@ -148,6 +153,7 @@
 		$('#program').select2();
 		$('#signupForm').on('submit', function(event) {
 			event.preventDefault();
+			$('#sign-in-btn').prop('disabled', true);
 			$.ajax({
 				url: $(this).attr('action'),
 				type: 'POST',

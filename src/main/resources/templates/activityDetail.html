@@ -123,6 +123,12 @@ width: calc(50% - 20px);
 width: calc(50% - 8px);
 }
 }
+
+button:disabled {
+    background-color: grey; /* Change background color to grey */
+    color: white;           /* Change text color to white */
+    cursor: not-allowed;    /* Change cursor to indicate it's disabled */
+}
 .search-header {
     background-color: #007bff;
     color: white;
@@ -318,7 +324,7 @@ p{
             <button type="submit" id="join">Join</button>
         </div>
         <div class="btn-block">
-            <button type="submit" id="backButton" style="background-color:grey;">Back Home</button>
+            <button type="button" id="backButton" style="background-color:grey;">Back Home</button>
         </div>
         </form>
     </div>
@@ -356,6 +362,8 @@ p{
 
         $('#activityForm').on('submit', function(event) {
             event.preventDefault();
+            $('#apply').prop('disabled', true);
+            $('#join').prop('disabled', true);
             const activityForm = {
                 booking_Id :$('#bookingRecordId').val(),
                 first_Name: $('#firstName').val(),
@@ -397,6 +405,8 @@ p{
                             icon: 'error',
                             confirmButtonText: 'Return'
                         }).then((result) => {
+                            $('#apply').prop('disabled', false);
+                            $('#join').prop('disabled', false);
                         });
                     }
                 },
