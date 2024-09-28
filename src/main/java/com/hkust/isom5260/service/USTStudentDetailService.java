@@ -1,7 +1,7 @@
 package com.hkust.isom5260.service;
 
 import com.hkust.isom5260.model.CustomUserDetails;
-import com.hkust.isom5260.model.USTStudent;
+import com.hkust.isom5260.model.USTUser;
 import com.hkust.isom5260.mapper.PSSUSUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ public class USTStudentDetailService implements UserDetailsService {
     private PSSUSUserMapper PSSUSUserMapper;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        USTStudent user = PSSUSUserMapper.selectByEmail(username);
+        USTUser user = PSSUSUserMapper.selectByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

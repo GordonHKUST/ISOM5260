@@ -153,29 +153,57 @@ p{
         <div class="logo-image">
             <img src="images/logo.png" alt="" />
         </div>
+
         <span class="logo_name">HKUST ISOM Club PSSUS</span>
     </div>
-
-    <div class="menu-items">
+    <div class="menu-items" th:if="${right == 'STUDENT'}">
         <ul class="nav-links">
             <li><a href="/users">
                 <i class="uil uil-estate"></i>
                 <span class="link-name">Dashboard</span>
             </a></li>
             <li><a href="/searchPanel">
-                <i class="uil uil-estate"></i>
+                <i class="uil uil-search"></i>
                 <span class="link-name">Find Soccer Pitch</span>
             </a></li>
             <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
                 <i class="uil uil-files-landscapes"></i>
-                <span class="link-name">Print Report</span>
+                <span class="link-name">Print Monthly Statement</span>
             </a>
             </li>
         </ul>
         <ul class="logout-mode">
             <li><a href="#">
                 <i class="uil uil-user"></i>
-                <span class="link-name" th:text="${student.email}"></span>
+                <span class="link-name" th:text="${user}"></span>
+            </a></li>
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">Sign Out</span>
+                </a>
+                <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+                    <input type="hidden" name="_method" value="post" />
+                </form>
+            </li>
+        </ul>
+    </div>
+    <div class="menu-items" th:if="${right == 'ADMIN'}">
+        <ul class="nav-links">
+            <li><a href="/users">
+                <i class="uil uil-estate"></i>
+                <span class="link-name">Dashboard</span>
+            </a></li>
+            <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
+                <i class="uil uil-files-landscapes"></i>
+                <span class="link-name">Print Monthly Summary</span>
+            </a>
+            </li>
+        </ul>
+        <ul class="logout-mode">
+            <li><a href="#">
+                <i class="uil uil-user"></i>
+                <span class="link-name" th:text="${user}"></span>
             </a></li>
             <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -317,10 +345,14 @@ p{
                </div>
             </div>
         </div>
-        <div class="btn-block" th:if="${bookingRecord == null}">
+        <div class="btn-block" th:if="${student.right == 'ADMIN' && bookingRecord != null}">
+            <button type="button" id="approve">Approve</button>
+            <button type="button" id="reject">Reject</button>
+        </div>
+        <div class="btn-block" th:if="${student.right == 'STUDENT' && bookingRecord == null}">
             <button type="submit" id="apply">Apply</button>
         </div>
-        <div class="btn-block" th:if="${bookingRecord != null && bookingRecord.email != student.email && !isJoined}">
+        <div class="btn-block" th:if="${student.right == 'STUDENT' && bookingRecord != null && bookingRecord.email != student.email && !isJoined}">
             <button type="submit" id="join">Join</button>
         </div>
         <div class="btn-block">
@@ -352,74 +384,78 @@ p{
     window.onload = initMap;
 
     $(document).ready(function() {
-
-
-        $('#backButton').click(function() {
-            // Redirect to the home page
-            window.location.href = '/users'; // Change this to your home page URL
-        });
-
-
-        $('#activityForm').on('submit', function(event) {
-            event.preventDefault();
-            $('#apply').prop('disabled', true);
-            $('#join').prop('disabled', true);
+        function handleActivity(action, isFormSubmit = false) {
             const activityForm = {
-                booking_Id :$('#bookingRecordId').val(),
+                booking_Id: $('#bookingRecordId').val(),
                 first_Name: $('#firstName').val(),
                 last_Name: $('#lastName').val(),
                 student_Id: $('#studentId').val(),
-                join_person : $('#joinPerson').val(),
-                email :$('#email').val(),
-                phone :$('#phone').val(),
+                join_person: $('#joinPerson').val(),
+                email: $('#email').val(),
+                phone: $('#phone').val(),
                 personal_trainer: $('input[name="personalTrainer"]:checked').val(),
-                campaign_Detail : $('#campaignDetail').val(),
-                campaign_Remark : $('#campaignRemark').val(),
+                campaign_Detail: $('#campaignDetail').val(),
+                campaign_Remark: $('#campaignRemark').val(),
                 start_Time: $('#startTime').val(),
-                end_Time : $('#endTime').val(),
-                schedule_id : $('#scheduleId').val()
+                end_Time: $('#endTime').val(),
+                schedule_id: $('#scheduleId').val()
             };
-            console.log(JSON.stringify(activityForm));
+
+            if (isFormSubmit) {
+                $('#apply').prop('disabled', true);
+                $('#join').prop('disabled', true);
+            }
+
             $.ajax({
                 type: 'POST',
-                url: $(this).attr('action'),
+                url: action,
                 contentType: 'application/json',
                 data: JSON.stringify(activityForm),
                 dataType: 'json',
                 success: function(response) {
-                    if (response.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: response.message,
-                            icon: 'success',
-                            confirmButtonText: 'Return'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/users';
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: response.message,
-                            icon: 'error',
-                            confirmButtonText: 'Return'
-                        }).then((result) => {
-                            $('#apply').prop('disabled', false);
-                            $('#join').prop('disabled', false);
-                        });
-                    }
-                },
-                error: function() {
+                    const title = response.success ? 'Success!' : 'Error!';
+                    const icon = response.success ? 'success' : 'error';
+
                     Swal.fire({
-                        title: 'Fail!',
-                        text: 'Registration Fail, please check',
-                        icon: 'fail',
+                        title: title,
+                        text: response.message,
+                        icon: icon,
                         confirmButtonText: 'Return'
                     }).then((result) => {
+                        if (response.success && result.isConfirmed) {
+                            window.location.href = '/users';
+                        } else if (!response.success) {
+                            $('#apply').prop('disabled', false);
+                            $('#join').prop('disabled', false);
+                        }
+                    });
+                },
+                error: function(response) {
+                    Swal.fire({
+                        title: 'Fail!',
+                        text: response.message,
+                        icon: 'fail',
+                        confirmButtonText: 'Return'
                     });
                 }
             });
+        }
+
+        $('#backButton').click(function() {
+            window.location.href = '/users';
+        });
+
+        $('#approve').click(function() {
+            handleActivity('approve');
+        });
+
+        $('#reject').click(function() {
+            handleActivity('reject');
+        });
+
+        $('#activityForm').on('submit', function(event) {
+            event.preventDefault();
+            handleActivity($(this).attr('action'), true);
         });
     });
 

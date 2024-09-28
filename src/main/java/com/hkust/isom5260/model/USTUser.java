@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class USTStudent {
+public class USTUser {
 
     private Long id;
 
@@ -24,4 +24,7 @@ public class USTStudent {
     private String studyYear;
 
     private String phone;
+
+    private String right;
+
 }

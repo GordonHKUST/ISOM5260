@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataTable Date Search Example</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="script.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link type="text/css" rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/searchpanes/2.3.2/css/searchPanes.dataTables.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/select/2.1.0/css/select.dataTables.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css}" />
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.6/css/responsive.dataTables.min.css">
+  <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"/>
+  <style>
+    .search-panel {
+      border: 1px solid #007bff;
+      border-top-right-radius: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      margin-top: -5px;
+    }
+    .search-header {
+      background-color: #007bff;
+      color: white;
+      padding: 5px;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="logo-name">
+    <div class="logo-image">
+      <img src="images/logo.png" alt="" />
+    </div>
+
+    <span class="logo_name">HKUST ISOM Club PSSUS</span>
+  </div>
+  <div class="menu-items" th:if="${right == 'STUDENT'}">
+    <ul class="nav-links">
+      <li><a href="/users">
+        <i class="uil uil-estate"></i>
+        <span class="link-name">Dashboard</span>
+      </a></li>
+      <li><a href="/searchPanel">
+        <i class="uil uil-search"></i>
+        <span class="link-name">Find Soccer Pitch</span>
+      </a></li>
+      <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
+        <i class="uil uil-files-landscapes"></i>
+        <span class="link-name">Print Monthly Statement</span>
+      </a>
+      </li>
+    </ul>
+    <ul class="logout-mode">
+      <li><a href="#">
+        <i class="uil uil-user"></i>
+        <span class="link-name" th:text="${user}"></span>
+      </a></li>
+      <li>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <i class="uil uil-signout"></i>
+          <span class="link-name">Sign Out</span>
+        </a>
+        <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+          <input type="hidden" name="_method" value="post" />
+        </form>
+      </li>
+    </ul>
+  </div>
+  <div class="menu-items" th:if="${right == 'ADMIN'}">
+    <ul class="nav-links">
+      <li><a href="/users">
+        <i class="uil uil-estate"></i>
+        <span class="link-name">Dashboard</span>
+      </a></li>
+      <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
+        <i class="uil uil-files-landscapes"></i>
+        <span class="link-name">Print Monthly Summary</span>
+      </a>
+      </li>
+    </ul>
+    <ul class="logout-mode">
+      <li><a href="#">
+        <i class="uil uil-user"></i>
+        <span class="link-name" th:text="${user}"></span>
+      </a></li>
+      <li>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <i class="uil uil-signout"></i>
+          <span class="link-name">Sign Out</span>
+        </a>
+        <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+          <input type="hidden" name="_method" value="post" />
+        </form>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section class="dashboard">
+  <div class="container mt-4">
+
+    <div class="search-header">
+      <h5 class="mb-0" style="margin-left: 7px;">Search Criteria</h5>
+    </div>
+    <div class="search-panel">
+      <div class="p-3">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="venueSelect">Select Report:</label>
+              <select class="form-control" id="reportSelect">
+                <option value="">Choose a Report...</option>
+                <option value="report1">Monthly Spending for Program</option>
+                <option value="report2">Most Booked District Schedule for Program</option>
+                <option value="report3">Not Approved Report Record</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="startDate">Start Date:</label>
+              <input type="date" class="form-control" id="startDate" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="endDate">End Date:</label>
+              <input type="date" class="form-control" id="endDate" />
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="program">Program:</label>
+              <select class="form-control" id="program">
+                <option value="" disabled selected>Select a program</option>
+                <option value="MSCISM">MSCISM</option>
+                <option value="MSCGO">MSCGO</option>
+                <option value="MSCBA">MSCBA</option>
+                <option value="BBAIM">BBAIM</option>
+                <option value="MBA">MBA</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6 align-self-end">
+            <a href="#" id="ajaxLink" class="btn btn-primary btn-block">Generate</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  $(document).ready(function() {
+      $('#ajaxLink').on('click', function(event) {
+        const reportSelect = $('#reportSelect').val();
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+        const program = $('#program').val();
+        const queryString = `?reportSelect=${encodeURIComponent(reportSelect)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&program=${encodeURIComponent(program)}`;
+        const url = '/triggerAdminReport' + queryString;
+        const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (newWindow) {
+          newWindow.opener = null;
+        } else {
+          alert('Please allow popups for this site to open the report.');
+        }
+      });
+});
+</script>
+</body>
+</html>

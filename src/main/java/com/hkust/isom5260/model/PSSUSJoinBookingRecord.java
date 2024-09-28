@@ -11,4 +11,5 @@ public class PSSUSJoinBookingRecord {
    private String booking_record_id;
    private String joiner_student_id;
    private String joiner_email;
+   private String record_create_date;
 }

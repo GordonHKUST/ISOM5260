@@ -4,7 +4,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,6 +22,7 @@ import com.hkust.isom5260.validators.PSSUSActivityRegisterValidator;
 import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -25,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
+import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,10 +52,15 @@ public class AppController {
     @Autowired
     private View error;
 
-	public AppController() {
+	private Connection conn;
+
+    public AppController() throws SQLException {
 		String propertiesFilePath = "src/main/resources/application.properties";
 		try (InputStream input = Files.newInputStream(Paths.get(propertiesFilePath))) {
 			properties.load(input);
+			conn = DriverManager.getConnection(properties.getProperty("spring.datasource.url"),
+					properties.getProperty("spring.datasource.username"),
+					properties.getProperty("spring.datasource.password"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -64,22 +75,28 @@ public class AppController {
 		}
 		boolean isBooking = false;
 		boolean isJoined = false;
-		USTStudent ustStudent = pssusUserMapper.selectByEmail(principal.getName());
-		model.addAttribute("student", ustStudent);
+		USTUser USTUser = pssusUserMapper.selectByEmail(principal.getName());
+		model.addAttribute("student", USTUser);
 		PSSUSBookingRecord bookingRecord = null;
 		if (bookingId != null) {
 			bookingRecord = pssusBookingMapper.getPSSUSBookingRecordByBookingId(String.valueOf(bookingId)).get(0);
-			USTStudent host = pssusUserMapper.selectByEmail(bookingRecord.getEmail());
+			USTUser host = pssusUserMapper.selectByEmail(bookingRecord.getEmail());
 			bookingRecord.setLast_Name(host.getLastName());
 			bookingRecord.setFirst_Name(host.getFirstName());
 					id = Integer.valueOf(bookingRecord.getSchedule_id());
 			isBooking = true;
-			if(pssusBookingMapper.getCountPSSUSBookingRecordByBookingId(String.valueOf(bookingId),ustStudent.getEmail()) > 0) {
+			if(pssusBookingMapper.getCountPSSUSBookingRecordByBookingId(String.valueOf(bookingId),USTUser.getEmail()) > 0) {
 				isJoined = true;
 			}
 		}
 		List<LCSDSoccerPitchSchedule> schedules =
 				lcsdSoccerPitchScheduleMapper.getLCSDSoccerPitchScheduleById(id);
+	    if(StringUtils.equals(USTUser.getRight(),"STUDENT")) {
+	  	    model.addAttribute("right", "STUDENT");
+	    }
+        else if(StringUtils.equals(USTUser.getRight(),"ADMIN")) {
+	  		model.addAttribute("right", "ADMIN");
+	    }
 		model.addAttribute("isBooking", isBooking);
 		model.addAttribute("scheduleId", id);
 		model.addAttribute("schedules", schedules.get(0));
@@ -96,7 +113,7 @@ public class AppController {
 		for(PSSUSBookingRecord record : schedules) {
 			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
 					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
-			USTStudent registStudent = pssusUserMapper.selectByEmail(record.getEmail());
+			USTUser registStudent = pssusUserMapper.selectByEmail(record.getEmail());
 			record.setFirst_Name(registStudent.getFirstName());
 			record.setLast_Name(registStudent.getLastName());
 			record.setEmail(registStudent.getEmail());
@@ -109,11 +126,15 @@ public class AppController {
 	}
 
 
-	@GetMapping("getOtherRegisterActivity")
+	@GetMapping("getPendingPSSUSBookingRecord")
 	@ResponseBody
-	public List<PSSUSBookingRecord> getOtherRegisterActivity(Model model, Principal principal) {
+	public List<PSSUSBookingRecord> getPendingPSSUSBookingRecord(Model model, Principal principal) {
 		String email = principal.getName();
-		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getOtherActivePSSUSBookingRecord(email);
+		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getPendingPSSUSBookingRecord();
+		return getPssusBookingRecords(schedules);
+	}
+
+	private List<PSSUSBookingRecord> getPssusBookingRecords(List<PSSUSBookingRecord> schedules) {
 		for(PSSUSBookingRecord record : schedules) {
 			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
 					.getLCSDSoccerPitchScheduleById(Integer.valueOf(record.getSchedule_id())).get(0);
@@ -125,37 +146,76 @@ public class AppController {
 		return schedules;
 	}
 
+	@GetMapping("getOtherRegisterActivity")
+	@ResponseBody
+	public List<PSSUSBookingRecord> getOtherRegisterActivity(Model model, Principal principal) {
+		String email = principal.getName();
+		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getOtherActivePSSUSBookingRecord(email);
+		return getPssusBookingRecords(schedules);
+	}
+
+	@GetMapping("getTxnRecordByUser")
+	@ResponseBody
+	public List<USTStudentWalletTransaction> getTxnRecordByUser(Model model, Principal principal) {
+		String email = principal.getName();
+		USTStudentWallet ustStudentWallet = pssusBookingMapper.getUSTStudentWalletByEmail(email).get(0);
+		List<USTStudentWalletTransaction> txnList = pssusBookingMapper.getUSTStudentWalletTxnByWalletId(ustStudentWallet.getWallet_id());
+		return txnList;
+	}
+
 	@GetMapping("searchPanel")
 	public String searchPanel(Model model,Principal principal) {
 		List<LCSDDistrict> lcsdDistricts = districtMapper.selectDistrictFromSchedule();
 		model.addAttribute("districts", lcsdDistricts);
-		USTStudent ustStudent = pssusUserMapper.selectByEmail(principal.getName());
-		model.addAttribute("student" , ustStudent.getEmail());
+		USTUser USTUser = pssusUserMapper.selectByEmail(principal.getName());
+		if(StringUtils.equals(USTUser.getRight(),"STUDENT")) {
+			model.addAttribute("right", "STUDENT");
+		}
+		else if(StringUtils.equals(USTUser.getRight(),"ADMIN")) {
+			model.addAttribute("right", "ADMIN");
+		}
+		model.addAttribute("student" , USTUser.getEmail());
 		return "searchPanel";
 	}
 
 	@PostMapping("/process_register")
-	public ResponseEntity<?> processRegister(USTStudent USTStudent ,  BindingResult result) {
+	public ResponseEntity<?> processRegister(USTUser USTUser ,  BindingResult result) {
 		if (result.hasErrors()) {
 			return ResponseEntity.badRequest()
 					.body("{\"success\": false, \"message\": " +
 							result.getFieldError().getRejectedValue() + "}");
 		}
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String encodedPassword = passwordEncoder.encode(USTStudent.getPassword());
-		USTStudent.setPassword(encodedPassword);
-		USTStudentWallet wallet = populateNewStudentBalance(USTStudent);
-		pssusUserMapper.insert(USTStudent);
+		String encodedPassword = passwordEncoder.encode(USTUser.getPassword());
+		USTUser.setPassword(encodedPassword);
+		USTUser.setRight("STUDENT");
+		USTStudentWallet wallet = populateNewStudentBalance(USTUser);
+		pssusUserMapper.insert(USTUser);
 		pssusUserMapper.insert_wallet(wallet);
+		USTStudentWalletTransaction walletTransaction = new USTStudentWalletTransaction();
+		USTStudentWallet newCreatedWallet = pssusBookingMapper.getUSTStudentWalletByEmail(USTUser.getEmail()).get(0);
+		Date transactionDate = new Date(); // Example transaction date
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		populateWalletTxn(formatter, transactionDate, walletTransaction, newCreatedWallet);
 		return ResponseEntity.ok()
 				.body("{\"success\": true, \"message\": \"User Registration successful\"}");
 	}
 
-	private static USTStudentWallet populateNewStudentBalance(USTStudent USTStudent) {
+	private void populateWalletTxn(SimpleDateFormat formatter, Date transactionDate, USTStudentWalletTransaction walletTransaction, USTStudentWallet wallet) {
+		String dateString = formatter.format(transactionDate);
+		walletTransaction.setTxn_date(dateString);
+		walletTransaction.setTransactionLog("NEW MEMBER CREATION");
+		walletTransaction.setAmount(3000);
+		walletTransaction.setAction_name("CR");
+		walletTransaction.setWalletId(wallet.getWallet_id());
+		pssusBookingMapper.insertStudentWalletTransaction(walletTransaction);
+	}
+
+	private static USTStudentWallet populateNewStudentBalance(USTUser USTUser) {
 		USTStudentWallet wallet = new USTStudentWallet();
 		wallet.setCurrBalance(3000);
 		wallet.setLastMonthBalanceLeft(0);
-		wallet.setEmail(USTStudent.getEmail());
+		wallet.setEmail(USTUser.getEmail());
 		return wallet;
 	}
 
@@ -170,12 +230,71 @@ public class AppController {
 		} else {
            PSSUSJoinBookingRecord joinBookingRecord = new PSSUSJoinBookingRecord();
 		   joinBookingRecord.setBooking_record_id(record.getBooking_Id());
-		   USTStudent joiner = pssusUserMapper.selectByEmail(principal.getName());
+		   USTUser joiner = pssusUserMapper.selectByEmail(principal.getName());
 		   joinBookingRecord.setJoiner_email(joiner.getEmail());
 		   joinBookingRecord.setJoiner_student_id(joiner.getStudentId());
+		   Date transactionDate = new Date(); // Example transaction date
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String dateString = formatter.format(transactionDate);
+		   joinBookingRecord.setRecord_create_date(dateString);
 		   pssusBookingMapper.insertJoinRecord(joinBookingRecord);
 		   return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Join successful\"}");
 		}
+	}
+
+	@PostMapping("/approve")
+	public ResponseEntity<?>  processActivityApprove(@RequestBody PSSUSBookingRecord record, Model model, BindingResult result ,HttpServletResponse response) {
+		if (result.hasErrors()) {
+			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
+		} else {
+			LCSDSoccerPitch pitch = null;
+			record.setStatus_code("RECORD_APPROVED");
+			USTUser user = pssusUserMapper.selectByEmail(record.getEmail());
+			USTStudentWallet wallet  = (USTStudentWallet) pssusBookingMapper.getUSTStudentWalletByEmail(record.getEmail()).get(0);
+			LCSDSoccerPitchSchedule schedule = lcsdSoccerPitchScheduleMapper
+					.getLCSDSoccerPitchScheduleById(Integer.parseInt(record.getSchedule_id()))
+					.get(0);
+			if(schedule != null) {
+				pitch = pssusBookingMapper.getLCSDSoccerPitchByPitchType(schedule.getFacility_type_name_en()).get(0);
+			} else {
+				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Current Schedule not found \"}");
+			}
+			USTStudentWalletTransaction transaction = new USTStudentWalletTransaction();
+			if(pitch != null) {
+				double balanceAfter = wallet.getCurrBalance() - Double.parseDouble(pitch.getPrice());
+				wallet.setCurrBalance(balanceAfter);
+				if (balanceAfter < 0) {
+					return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Current Balance of student not fulfilled \"}");
+				} else {
+					pssusBookingMapper.updateWallet(wallet);
+				}
+				transaction.setAmount(Double.parseDouble(pitch.getPrice()));
+				transaction.setAction_name("DR");
+				transaction.setTransactionLog("VENUE_BOOKING_APPROVED");
+				transaction.setWalletId(wallet.getWallet_id());
+				Date transactionDate = new Date(); // Example transaction date
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String dateString = formatter.format(transactionDate);
+				transaction.setTxn_date(dateString);
+				transaction.setBooking_id(Integer.parseInt(record.getBooking_Id()));
+				pssusBookingMapper.insertStudentWalletTransaction(transaction);
+				pssusBookingMapper.updateStsCode(record);
+			} else {
+				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Pitch cannot find, please check \"}");
+			}
+		}
+		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Approved successful\"}");
+	}
+
+	@PostMapping("/reject")
+	public ResponseEntity<?>  processActivityReject(@RequestBody PSSUSBookingRecord record, Model model, BindingResult result ,HttpServletResponse response) {
+		if (result.hasErrors()) {
+			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
+		} else {
+			record.setStatus_code("RECORD_REJECTED");
+			pssusBookingMapper.updateStsCode(record);
+		}
+		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Rejected successful\"}");
 	}
 
 	@PostMapping("/actReg")
@@ -185,31 +304,71 @@ public class AppController {
 			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
 		} else {
 			record.setStatus_code("PENDING_APPROVAL");
+			Date transactionDate = new Date(); // Example transaction date
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String dateString = formatter.format(transactionDate);
+			record.setRecord_create_date(dateString);
 			pssusBookingMapper.insertBookingRecord(record);
 		}
 		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Registration successful\"}");
 	}
 
 	@GetMapping("/triggerReport")
-	public ResponseEntity<String> triggerReport(HttpServletResponse response) throws IOException {
-		jasperReportService.generateReport(response,properties);
+	public ResponseEntity<String> triggerReport(Principal principal,HttpServletResponse response) throws IOException {
+		jasperReportService.generateReport(response,properties, principal);
 		return ResponseEntity.ok("Report Generated successfully");
 	}
-	
+
+	@GetMapping("/adminReport")
+	public String adminReport(Principal principal,Model model,HttpServletResponse response) throws IOException {
+		USTUser ustUser = pssusUserMapper.selectByEmail(principal.getName());
+		if(StringUtils.equals(ustUser.getRight(),"STUDENT")) {
+			model.addAttribute("right", "STUDENT");
+		}
+		else if(StringUtils.equals(ustUser.getRight(),"ADMIN")) {
+			model.addAttribute("right", "ADMIN");
+		}
+		return "reportPrint";
+	}
+
+	@GetMapping("/triggerAdminReport")
+	public ResponseEntity<String> triggerAdminReport(@RequestParam(name="reportSelect") String reportSelect,
+													 @RequestParam(name="startDate") String startDate,
+													 @RequestParam(name="endDate") String endDate,
+													 @RequestParam(name="program") String program,
+													 Principal principal,HttpServletResponse response) throws IOException {
+		AdminReportCriteria criteria = new AdminReportCriteria();
+		criteria.setReportSelect(reportSelect);
+		criteria.setStartDate(startDate);
+		criteria.setEndDate(endDate);
+		criteria.setProgram(program);
+		jasperReportService.generateAdminReport(criteria,response,properties, principal, conn);
+		return ResponseEntity.ok("Report Generated successfully");
+	}
+
 	@GetMapping("/users")
 	public String greeting(Model model, Principal principal,HttpServletResponse response) throws JRException, SQLException, IOException {
 		if(principal == null) {
 			return "/login";
 		}
-		USTStudentWallet wallet = pssusBookingMapper.getUSTStudentWalletByEmail(principal.getName()).get(0);
-		   if(wallet != null) {
-		       model.addAttribute("walletAmt",wallet.getCurrBalance());
-		   } else {
-		   	   model.addAttribute("walletAmt","NaN");
-		   }
-		model.addAttribute("user", principal.getName());
-		model.addAttribute("avaliableSoccerSize",lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
-		model.addAttribute("youreventsize",pssusBookingMapper.getMyPSSUSBookingRecordByEmail(principal.getName()).size());
+		USTUser ustUser = pssusUserMapper.selectByEmail(principal.getName());
+		if(StringUtils.equals(ustUser.getRight(),"STUDENT")) {
+			USTStudentWallet wallet = pssusBookingMapper.getUSTStudentWalletByEmail(principal.getName()).get(0);
+			if (wallet != null) {
+				model.addAttribute("walletAmt", wallet.getCurrBalance());
+			} else {
+				model.addAttribute("walletAmt", "NaN");
+			}
+			model.addAttribute("user", principal.getName());
+			model.addAttribute("right","STUDENT");
+			model.addAttribute("avaliableSoccerSize", lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
+			model.addAttribute("youreventsize", pssusBookingMapper.getMyPSSUSBookingRecordByEmail(principal.getName()).size());
+		} else if(StringUtils.equals(ustUser.getRight(),"ADMIN")) {
+			model.addAttribute("user",principal.getName());
+			model.addAttribute("right","ADMIN");
+			model.addAttribute("pendingRecordSize", pssusBookingMapper.getPendingPSSUSBookingRecord().size());
+			model.addAttribute("avaliableSoccerSize", lcsdSoccerPitchScheduleMapper.getAvaliableLCSDSoccerPitchSchedule().size());
+		}
 		return "greeting";
 	}
 
@@ -220,7 +379,7 @@ public class AppController {
 
 	@GetMapping({"","/login"})
 	public String login(Model model, @RequestParam(required = false) String error) {
-		model.addAttribute("user", new USTStudent());
+		model.addAttribute("user", new USTUser());
         if(error != null &&
 				error.equals(String.valueOf(HttpStatus.UNAUTHORIZED.value()))) {
 			model.addAttribute("error",  HttpStatus.UNAUTHORIZED.value() + " : Bad Credentials");

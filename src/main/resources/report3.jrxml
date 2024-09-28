@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="HKUST ISOM5260"/>
+    <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+    <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="280"/>
+    <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="709"/>
+    <style name="Title" forecolor="#333333" fontName="Times New Roman" fontSize="30" isBold="true"/>
+    <style name="SubTitle" forecolor="#666666" fontName="Times New Roman" fontSize="18" isBold="false"/>
+    <style name="ColumnHeader" forecolor="#FFFFFF" backcolor="#007ACC" fontName="Arial" fontSize="14" isBold="true"/>
+    <style name="Detail" mode="Transparent" fontName="Times New Roman" fontSize="12"/>
+    <style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+            <style mode="Opaque" backcolor="#F6F6F6"/>
+        </conditionalStyle>
+    </style>
+    <style name="Table" mode="Opaque">
+        <box>
+            <pen lineWidth="1.0" lineColor="#CCCCCC"/>
+        </box>
+    </style>
+    <style name="TableHeader" mode="Opaque" backcolor="#007ACC">
+        <box>
+            <pen lineWidth="0.5" lineColor="#000000"/>
+        </box>
+    </style>
+    <style name="TableCell" mode="Opaque" backcolor="#FFFFFF">
+        <box>
+            <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+        </box>
+    </style>
+    <style name="TableCellAlt" mode="Opaque" backcolor="#F6F6F6">
+        <box>
+            <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+        </box>
+    </style>
+    <parameter name="program" class="java.lang.String"/>
+    <parameter name="startDate" class="java.sql.Date"/>
+    <parameter name="endDate" class="java.sql.Date"/>
+    <queryString>
+        <![CDATA[SELECT * FROM "SLLIAC"."USTUSER"
+JOIN "SLLIAC"."PSSUS_BOOKING_RECORD"
+ON USTUSER.EMAIL = PSSUS_BOOKING_RECORD.EMAIL
+WHERE USTUSER.program = $P{program}
+AND PSSUS_BOOKING_RECORD.STATUS_CODE = 'TIME_SLOT_STARTED_AND_NOT_APPROVED'
+OR PSSUS_BOOKING_RECORD.STATUS_CODE = 'RECORD_REJECTED'
+AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') >= $P{startDate}
+AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') <= $P{endDate}]]>
+    </queryString>
+    <field name="ID" class="java.math.BigDecimal">
+        <property name="com.jaspersoft.studio.field.name" value="ID"/>
+        <property name="com.jaspersoft.studio.field.label" value="ID"/>
+    </field>
+    <field name="EMAIL" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+        <property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+    </field>
+    <field name="PASSWORD" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="PASSWORD"/>
+        <property name="com.jaspersoft.studio.field.label" value="PASSWORD"/>
+    </field>
+    <field name="FIRSTNAME" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="FIRSTNAME"/>
+        <property name="com.jaspersoft.studio.field.label" value="FIRSTNAME"/>
+    </field>
+    <field name="LASTNAME" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="LASTNAME"/>
+        <property name="com.jaspersoft.studio.field.label" value="LASTNAME"/>
+    </field>
+    <field name="STUDENTID" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="STUDENTID"/>
+        <property name="com.jaspersoft.studio.field.label" value="STUDENTID"/>
+    </field>
+    <field name="PHONE" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="PHONE"/>
+        <property name="com.jaspersoft.studio.field.label" value="PHONE"/>
+    </field>
+    <field name="STUDYYEAR" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="STUDYYEAR"/>
+        <property name="com.jaspersoft.studio.field.label" value="STUDYYEAR"/>
+    </field>
+    <field name="PROGRAM" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="PROGRAM"/>
+        <property name="com.jaspersoft.studio.field.label" value="PROGRAM"/>
+    </field>
+    <field name="RIGHT" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="RIGHT"/>
+        <property name="com.jaspersoft.studio.field.label" value="RIGHT"/>
+    </field>
+    <field name="BOOKING_ID" class="java.math.BigDecimal">
+        <property name="com.jaspersoft.studio.field.name" value="BOOKING_ID"/>
+        <property name="com.jaspersoft.studio.field.label" value="BOOKING_ID"/>
+    </field>
+    <field name="STUDENT_ID" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="STUDENT_ID"/>
+        <property name="com.jaspersoft.studio.field.label" value="STUDENT_ID"/>
+    </field>
+    <field name="CAMPAIGN_DETAIL" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="CAMPAIGN_DETAIL"/>
+        <property name="com.jaspersoft.studio.field.label" value="CAMPAIGN_DETAIL"/>
+    </field>
+    <field name="CAMPAIGN_REMARK" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="CAMPAIGN_REMARK"/>
+        <property name="com.jaspersoft.studio.field.label" value="CAMPAIGN_REMARK"/>
+    </field>
+    <field name="JOIN_PERSON" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="JOIN_PERSON"/>
+        <property name="com.jaspersoft.studio.field.label" value="JOIN_PERSON"/>
+    </field>
+    <field name="COLUMN_16" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+        <property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+    </field>
+    <field name="COLUMN_17" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="PHONE"/>
+        <property name="com.jaspersoft.studio.field.label" value="PHONE"/>
+    </field>
+    <field name="PERSONAL_TRAINER" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="PERSONAL_TRAINER"/>
+        <property name="com.jaspersoft.studio.field.label" value="PERSONAL_TRAINER"/>
+    </field>
+    <field name="SCHEDULE_ID" class="java.math.BigDecimal">
+        <property name="com.jaspersoft.studio.field.name" value="SCHEDULE_ID"/>
+        <property name="com.jaspersoft.studio.field.label" value="SCHEDULE_ID"/>
+    </field>
+    <field name="STATUS_CODE" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="STATUS_CODE"/>
+        <property name="com.jaspersoft.studio.field.label" value="STATUS_CODE"/>
+    </field>
+    <field name="RECORD_CREATE_DATE" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="RECORD_CREATE_DATE"/>
+        <property name="com.jaspersoft.studio.field.label" value="RECORD_CREATE_DATE"/>
+    </field>
+    <variable name="TotalTxnCount" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{EMAIL}]]></variableExpression>
+    </variable>
+    <title>
+        <band height="106" splitType="Stretch">
+            <staticText>
+                <reportElement style="Title" x="15" y="20" width="320" height="45" uuid="82d05c2b-4a32-4ff5-be1b-0f116e4d9ae9"/>
+                <text><![CDATA[HKUST ISOM PSSUS]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="SubTitle" x="15" y="65" width="310" height="25" uuid="3953a09d-1438-4532-ab9a-0b8a03a0c685"/>
+                <text><![CDATA[Not Approved Records]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="360" y="10" width="55" height="20" uuid="0356c3c5-adda-417a-b8a0-1a941ab3ac34"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Print Date:]]></text>
+            </staticText>
+            <textField pattern="EEEEE dd MMMMM yyyy">
+                <reportElement x="415" y="10" width="150" height="20" uuid="ca04b843-52a6-4cc8-a3db-5d92babe1526"/>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="360" y="30" width="55" height="20" uuid="bd0b51ce-89ae-4e64-9490-c536c9cf8e1c"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Start Date:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="415" y="30" width="150" height="20" uuid="b4f904db-32c1-437e-9beb-8bef4d4cd937"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="360" y="50" width="55" height="20" uuid="51b0179c-ee07-455a-8040-4355e3e3a5ae"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[End Date:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="415" y="50" width="150" height="20" uuid="5426ce5f-9691-4645-81d7-e8262b0f0445"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="360" y="70" width="55" height="20" uuid="d3f68f05-899f-426d-9c2d-573560b092cc"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Program:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="415" y="70" width="150" height="20" uuid="2149d667-e158-43ce-bd1f-2f2c57332be7"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="60">
+            <staticText>
+                <reportElement style="TableHeader" x="250" y="30" width="70" height="30" backcolor="#A8AEB3" uuid="141b4c57-cbdf-4dae-a86a-1488fbd7cf08"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Schedule Id]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="TableHeader" x="190" y="30" width="60" height="30" backcolor="#A8AEB3" uuid="6c9606f3-cc4c-4137-bab2-7e3055a8fc23"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Booking Id]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="TableHeader" x="100" y="30" width="90" height="30" backcolor="#A8AEB3" uuid="187e1d3c-6f1e-4256-bbff-d021692ead3c"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Student Email]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="TableHeader" x="20" y="30" width="80" height="30" backcolor="#A8AEB3" uuid="6d2c91b1-f397-4f77-bed3-f7082c51fd4b"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Student Id]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="TableHeader" x="320" y="30" width="110" height="30" backcolor="#A8AEB3" uuid="5c62253d-f146-4da0-80b6-cb24eb84bc25"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status Code]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="TableHeader" x="430" y="30" width="110" height="30" backcolor="#A8AEB3" uuid="7747e204-8b41-4ecd-af82-64e8d5e32579"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Record Creation Date]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="30">
+            <textField>
+                <reportElement style="TableCell" x="20" y="0" width="81" height="30" uuid="17e8e494-36b3-4103-8d63-577921657feb"/>
+                <box>
+                    <pen lineColor="#0A0A0A"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="TableCell" x="100" y="0" width="90" height="30" uuid="41e89814-5fa3-4bc5-afa8-3348e0972b4a"/>
+                <box>
+                    <pen lineColor="#080707"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="TableCell" x="250" y="0" width="70" height="30" uuid="62f81b3c-c70d-4917-9e8b-0faec4fdbd88"/>
+                <box>
+                    <pen lineColor="#0F0F0F"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{SCHEDULE_ID}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="TableCell" x="190" y="0" width="60" height="30" uuid="6c9da580-d85b-49c1-95c7-95796fba035b"/>
+                <box>
+                    <pen lineColor="#080707"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{BOOKING_ID}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="TableCell" x="320" y="0" width="110" height="30" uuid="101b7e81-f020-461f-93fb-2b97f11fab99"/>
+                <box>
+                    <pen lineColor="#0A0A0A"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{STATUS_CODE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="TableCell" x="430" y="0" width="110" height="30" uuid="e12776b9-bd2b-4360-ac4c-d39cb3f6cd98"/>
+                <box>
+                    <pen lineColor="#0A0A0A"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{RECORD_CREATE_DATE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="60">
+            <staticText>
+                <reportElement style="TableHeader" x="170" y="20" width="100" height="20" backcolor="#A8AEB3" uuid="5f12e590-fb70-4f99-a5a5-9d22039efa5a"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total Record:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="TableCell" x="270" y="20" width="80" height="20" uuid="854473ae-5916-49ff-9dfb-723835badafc"/>
+                <box>
+                    <pen lineColor="#080707"/>
+                </box>
+                <textFieldExpression><![CDATA[$V{TotalTxnCount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnFooter>
+    <lastPageFooter>
+        <band height="60">
+            <staticText>
+                <reportElement positionType="Float" mode="Opaque" x="-20" y="15" width="595" height="30" backcolor="#E6E8E9" uuid="b942e9db-c175-42cb-9230-1457c280f975"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Serif" size="9" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[THANK YOU FOR YOUR READING]]></text>
+            </staticText>
+        </band>
+    </lastPageFooter>
+</jasperReport>

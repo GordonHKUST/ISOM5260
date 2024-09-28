@@ -50,27 +50,54 @@
 
         <span class="logo_name">HKUST ISOM Club PSSUS</span>
     </div>
-
-    <div class="menu-items">
+    <div class="menu-items" th:if="${right == 'STUDENT'}">
         <ul class="nav-links">
             <li><a href="/users">
                 <i class="uil uil-estate"></i>
                 <span class="link-name">Dashboard</span>
             </a></li>
             <li><a href="/searchPanel">
-                <i class="uil uil-estate"></i>
+                <i class="uil uil-search"></i>
                 <span class="link-name">Find Soccer Pitch</span>
             </a></li>
             <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
                 <i class="uil uil-files-landscapes"></i>
-                <span class="link-name">Print Report</span>
+                <span class="link-name">Print Monthly Statement</span>
             </a>
             </li>
         </ul>
         <ul class="logout-mode">
             <li><a href="#">
                 <i class="uil uil-user"></i>
-                <span class="link-name" th:text="${student}"></span>
+                <span class="link-name" th:text="${user}"></span>
+            </a></li>
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">Sign Out</span>
+                </a>
+                <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+                    <input type="hidden" name="_method" value="post" />
+                </form>
+            </li>
+        </ul>
+    </div>
+    <div class="menu-items" th:if="${right == 'ADMIN'}">
+        <ul class="nav-links">
+            <li><a href="/users">
+                <i class="uil uil-estate"></i>
+                <span class="link-name">Dashboard</span>
+            </a></li>
+            <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
+                <i class="uil uil-files-landscapes"></i>
+                <span class="link-name">Print Monthly Summary</span>
+            </a>
+            </li>
+        </ul>
+        <ul class="logout-mode">
+            <li><a href="#">
+                <i class="uil uil-user"></i>
+                <span class="link-name" th:text="${user}"></span>
             </a></li>
             <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -15,4 +15,10 @@ public class USTStudentWalletTransaction {
     private double amount;
 
     private String transactionLog;
+
+    private int booking_id;
+
+    private String txn_date;
+
+    private String action_name;
 }

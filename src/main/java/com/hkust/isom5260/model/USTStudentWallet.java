@@ -10,7 +10,7 @@ public class USTStudentWallet {
 
     private String email;
 
-    private int walletId;
+    private int wallet_id;
 
     private double currBalance;
 

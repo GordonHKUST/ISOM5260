@@ -156,10 +156,12 @@ public class SyncLCSDSoccerPitchCronJob {
     }
 
     private void performHousekeeping() {
+        System.out.println("Housekeep Soccer Pitch Schedule started");
         List<LCSDSoccerPitchSchedule> houseKeepSchedules = soccerPitchScheduleMapper.getHouseKeepLCSDSoccerPitchSchedule();
         for (LCSDSoccerPitchSchedule soccerPitch : houseKeepSchedules) {
             runHouseKeep(soccerPitch);
         }
+        System.out.println("Housekeep Soccer Pitch Schedule ended");
     }
 
     private void runHouseKeep(LCSDSoccerPitchSchedule soccerPitch) {

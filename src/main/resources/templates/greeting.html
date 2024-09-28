@@ -30,8 +30,7 @@
 
     <span class="logo_name">HKUST ISOM Club PSSUS</span>
   </div>
-
-  <div class="menu-items">
+  <div class="menu-items" th:if="${right == 'STUDENT'}">
     <ul class="nav-links">
       <li><a href="/users">
         <i class="uil uil-estate"></i>
@@ -43,7 +42,35 @@
       </a></li>
       <li><a href="/triggerReport" target="_blank" rel="noopener noreferrer">
         <i class="uil uil-files-landscapes"></i>
-        <span class="link-name">Print Report</span>
+        <span class="link-name">Print Monthly Statement</span>
+      </a>
+      </li>
+    </ul>
+    <ul class="logout-mode">
+      <li><a href="#">
+        <i class="uil uil-user"></i>
+        <span class="link-name" th:text="${user}"></span>
+      </a></li>
+      <li>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <i class="uil uil-signout"></i>
+          <span class="link-name">Sign Out</span>
+        </a>
+        <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+          <input type="hidden" name="_method" value="post" />
+        </form>
+      </li>
+    </ul>
+  </div>
+  <div class="menu-items" th:if="${right == 'ADMIN'}">
+    <ul class="nav-links">
+      <li><a href="/users">
+        <i class="uil uil-estate"></i>
+        <span class="link-name">Dashboard</span>
+      </a></li>
+      <li><a href="/adminReport" target="_blank" rel="noopener noreferrer">
+        <i class="uil uil-files-landscapes"></i>
+        <span class="link-name">Print Managerial Report</span>
       </a>
       </li>
     </ul>
@@ -69,8 +96,60 @@
   <div class="top">
     <i class="uil uil-bars sidebar-toggle"></i>
   </div>
+  <div class="dash-content" th:if="${right == 'ADMIN'}">
+    <div class="overview">
+      <div class="title">
+        <i class="uil uil-tachometer-fast-alt"></i>
+        <span class="text">Dashboard</span>
+      </div>
 
-  <div class="dash-content">
+      <div class="boxes">
+        <div class="box box1">
+          <i class="uil uil-money-bill"></i>
+          <span class="text">UnApproval Record</span>
+          <span class="number"><div th:text="${pendingRecordSize}"></div></span>
+        </div>
+        <div class="box box2">
+          <i class="uil uil-calendar-alt"></i>
+          <span class="text">Total available event</span>
+          <span class="number">
+            <div th:text="${avaliableSoccerSize}"></div>
+          </span>
+        </div>
+        <div class="box box3">
+          <i class="uil uil-bell"></i>
+          <span class="text">Monthly Used Budget</span>
+          <span class="number">
+          <div th:text="60000"></div>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="title">
+        <i class="uil uil-user-plus"></i>
+        <span class="text">Pending Approval Campaign</span>
+      </div>
+    </div>
+    <div class="activity-data">
+      <table id="pendingCampaign" class="table table-striped">
+        <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Campaign Detail</th>
+          <th>Schedule Available Date</th>
+          <th>Schedule Location</th>
+          <th>Schedule Start Time</th>
+          <th>Schedule End Time</th>
+          <th>Activity Status</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <div class="dash-content" th:if="${right == 'STUDENT'}">
     <div class="overview">
       <div class="title">
         <i class="uil uil-tachometer-fast-alt"></i>
@@ -98,6 +177,27 @@
           </span>
         </div>
       </div>
+    </div>
+
+    <div class="activity">
+      <div class="title">
+        <i class="uil uil-user-plus"></i>
+        <span class="text">Your Transaction Record</span>
+      </div>
+    </div>
+    <div class="activity-data">
+      <table id="transaction" class="table table-striped">
+        <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Transaction ID</th>
+          <th>Amount</th>
+          <th>Action Name</th>
+          <th>Transaction Log</th>
+          <th>Transaction Date</th>
+        </tr>
+        </thead>
+      </table>
     </div>
 
     <div class="activity">
@@ -171,6 +271,73 @@
 
 <script>
   $(document).ready(function() {
+
+    $('#transaction').DataTable({
+      "sAjaxSource": "/getTxnRecordByUser",
+      "sAjaxDataProp": "",
+      "order": [[ 0, "asc" ]],
+      "columns": [
+        { "data": "booking_id"},
+        { "data": "transactionId"},
+        { "data": "amount"},
+        { "data": "action_name"},
+        { "data": "transactionLog"},
+        { "data": "txn_date"},
+      ],
+      "columnDefs": [
+        {
+          "targets": 0,
+          "render": function(data, type, row) {
+            if(data !== 0)
+            {
+              return `<a href="/activityDetail?bookingId=${data}">Click</a>`;
+            } else {
+              return ''
+            }
+          }
+        }
+      ],
+      responsive:true,
+      layout: {
+        top1: {
+          searchPanes: {
+            viewTotal: true
+          }
+        }
+      }
+    });
+
+    $('#pendingCampaign').DataTable({
+      "sAjaxSource": "/getPendingPSSUSBookingRecord",
+      "sAjaxDataProp": "",
+      "order": [[ 0, "asc" ]],
+      "columns": [
+        { "data": "booking_Id"},
+        { "data": "campaign_Detail"},
+        { "data": "available_date"},
+        { "data": "venue_Name_En"},
+        { "data": "session_start_time"},
+        { "data": "session_end_time"},
+        { "data": "status_code"}
+      ],
+      "columnDefs": [
+        {
+          "targets": 0,
+          "render": function(data, type, row) {
+            return `<a href="/activityDetail?bookingId=${data}">Click</a>`;
+          }
+        }
+      ],
+      responsive:true,
+      layout: {
+        top1: {
+          searchPanes: {
+            viewTotal: true
+          }
+        }
+      }
+    });
+
     $('#otherCampaign').DataTable({
       "sAjaxSource": "/getOtherRegisterActivity",
       "sAjaxDataProp": "",
