@@ -336,13 +336,13 @@ public class AppController {
 													 @RequestParam(name="startDate") String startDate,
 													 @RequestParam(name="endDate") String endDate,
 													 @RequestParam(name="program") String program,
-													 Principal principal,HttpServletResponse response) throws IOException {
+													 Principal principal,HttpServletResponse response) throws IOException, SQLException {
 		AdminReportCriteria criteria = new AdminReportCriteria();
 		criteria.setReportSelect(reportSelect);
 		criteria.setStartDate(startDate);
 		criteria.setEndDate(endDate);
 		criteria.setProgram(program);
-		jasperReportService.generateAdminReport(criteria,response,properties, principal, conn);
+		jasperReportService.generateAdminReport(criteria,response,properties, principal);
 		return ResponseEntity.ok("Report Generated successfully");
 	}
 

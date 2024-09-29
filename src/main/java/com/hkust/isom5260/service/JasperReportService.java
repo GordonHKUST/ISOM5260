@@ -20,7 +20,10 @@ import java.util.Properties;
 @Service
 public class JasperReportService {
 
-    public void generateAdminReport(AdminReportCriteria criteria, HttpServletResponse response, Properties properties, Principal principal, Connection connection) throws IOException {
+    public void generateAdminReport(AdminReportCriteria criteria, HttpServletResponse response, Properties properties, Principal principal) throws IOException, SQLException {
+        Connection conn = DriverManager.getConnection(properties.getProperty("spring.datasource.url"),
+                properties.getProperty("spring.datasource.username"),
+                properties.getProperty("spring.datasource.password"));
         response.setContentType("application/pdf");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"report.pdf\"");
         try (OutputStream outputStream = response.getOutputStream()) {
@@ -44,39 +47,11 @@ public class JasperReportService {
             parameters.put("endDate", Date.valueOf(criteria.getEndDate()));
             parameters.put("program",criteria.getProgram());
             JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, conn);
             JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
         } catch (JRException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Report generation failed");
         }
-    }
-
-    private static void adminRptGenerate(AdminReportCriteria criteria, OutputStream outputStream , Properties properties, String email) throws SQLException, JRException {
-        Connection conn = DriverManager.getConnection(properties.getProperty("spring.datasource.url"),
-                properties.getProperty("spring.datasource.username"),
-                properties.getProperty("spring.datasource.password"));
-        Map<String, Object> parameters = new HashMap<>();
-        String reportPath = "";
-        switch (criteria.getReportSelect()) {
-            case "report1":
-                reportPath = "src/main/resources/report1.jrxml";
-                break;
-            case "report2":
-                reportPath = "src/main/resources/report2.jrxml";
-                break;
-            case "report3":
-                reportPath = "src/main/resources/report3.jrxml";
-                break;
-            default:
-                reportPath = "default/path/to/report.jrxml";
-                break;
-        }
-        parameters.put("startdate", Date.valueOf(criteria.getStartDate()));
-        parameters.put("enddate", Date.valueOf(criteria.getEndDate()));
-        parameters.put("program",criteria.getProgram());
-        JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, conn);
-        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
     }
 
     public void generateReport(HttpServletResponse response, Properties properties, Principal principal) throws IOException {
