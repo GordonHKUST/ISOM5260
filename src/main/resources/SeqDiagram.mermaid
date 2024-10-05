@@ -1,0 +1,72 @@
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    participant Database
+    participant LCSD_API
+
+    User->>Frontend: Register student account
+    Frontend->>Backend: Send registration data
+    Backend->>Database: Create user account
+    Database-->>Backend: Confirm account creation
+    Backend->>Database: Credit 3000 points to user
+    Backend-->>Frontend: Registration successful
+
+    User->>Frontend: Create campaign
+    Frontend->>Backend: Send campaign details
+    Backend->>Database: Store campaign data
+    Backend->>Database: Update campaign status to "Pending Approval"
+    Database-->>Backend: Confirm update
+    Backend-->>Frontend: Campaign created
+
+    loop SyncLCSDSoccerPitchJob
+        Backend->>LCSD_API: Fetch soccer pitch data
+        LCSD_API-->>Backend: Return pitch data
+        Backend->>Database: Check if record exists
+        alt Record doesn't exist
+            Backend->>Database: Create new record
+        else Record exists
+            Backend->>Database: Update availability status
+        end
+    end
+
+    loop Housekeeping
+        Backend->>Database: Check for outdated schedules
+        Database-->>Backend: Return outdated schedules
+        Backend->>Database: Update status to "Timeout"
+        Backend->>Database: Check for unapproved bookings
+        Database-->>Backend: Return unapproved bookings
+        Backend->>Database: Update status to "Not Approved and Timed Out"
+    end
+
+    actor Admin
+    Admin->>Frontend: Review booking request
+    Frontend->>Backend: Fetch booking details
+    Backend->>Database: Retrieve booking data
+    Database-->>Backend: Return booking data
+    Backend-->>Frontend: Display booking details
+    alt Admin approves
+        Admin->>Frontend: Approve booking
+        Frontend->>Backend: Send approval
+        Backend->>Database: Update booking status to "Approved"
+        Backend->>Database: Deduct points from host's wallet
+    else Admin rejects
+        Admin->>Frontend: Reject booking
+        Frontend->>Backend: Send rejection
+        Backend->>Database: Update booking status to "Record Rejected"
+    end
+    Backend-->>Frontend: Confirm action
+
+    User->>Frontend: Request monthly statement
+    Frontend->>Backend: Fetch user's point usage
+    Backend->>Database: Retrieve point transactions
+    Database-->>Backend: Return transaction data
+    Backend-->>Frontend: Send statement data
+    Frontend-->>User: Display monthly statement
+
+    Admin->>Frontend: Generate business report
+    Frontend->>Backend: Request report data
+    Backend->>Database: Fetch comprehensive data
+    Database-->>Backend: Return report data
+    Backend-->>Frontend: Send processed report
+    Frontend-->>Admin: Display business report

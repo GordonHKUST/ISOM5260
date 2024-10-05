@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.hkust.isom5260.model.*;
 import com.hkust.isom5260.mapper.LCSDDistrictMapper;
@@ -19,6 +20,7 @@ import com.hkust.isom5260.mapper.PSSUSBookingMapper;
 import com.hkust.isom5260.mapper.PSSUSUserMapper;
 import com.hkust.isom5260.service.JasperReportService;
 import com.hkust.isom5260.validators.PSSUSActivityRegisterValidator;
+import com.hkust.isom5260.validators.PSSUSUserValidator;
 import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,8 @@ public class AppController {
 	private PSSUSActivityRegisterValidator pssusActivityRegisterValidator;
 	@Autowired
 	private PSSUSBookingMapper pssusBookingMapper;
+	@Autowired
+	private PSSUSUserValidator pssusUserValidator;
     @Autowired
     private View error;
 
@@ -97,6 +101,7 @@ public class AppController {
         else if(StringUtils.equals(USTUser.getRight(),"ADMIN")) {
 	  		model.addAttribute("right", "ADMIN");
 	    }
+		model.addAttribute("user",principal.getName());
 		model.addAttribute("isBooking", isBooking);
 		model.addAttribute("scheduleId", id);
 		model.addAttribute("schedules", schedules.get(0));
@@ -154,6 +159,12 @@ public class AppController {
 		return getPssusBookingRecords(schedules);
 	}
 
+	@GetMapping("getJoinerOfEvent")
+	@ResponseBody
+	public List<USTUser> getJoinerOfEvent(@RequestParam String bookingId,  Model model) {
+        return pssusBookingMapper.getJoinUserByBookingId(String.valueOf(Integer.parseInt(bookingId)));
+	}
+
 	@GetMapping("getTxnRecordByUser")
 	@ResponseBody
 	public List<USTStudentWalletTransaction> getTxnRecordByUser(Model model, Principal principal) {
@@ -174,16 +185,20 @@ public class AppController {
 		else if(StringUtils.equals(USTUser.getRight(),"ADMIN")) {
 			model.addAttribute("right", "ADMIN");
 		}
-		model.addAttribute("student" , USTUser.getEmail());
+		model.addAttribute("user" , USTUser.getEmail());
 		return "searchPanel";
 	}
 
 	@PostMapping("/process_register")
 	public ResponseEntity<?> processRegister(USTUser USTUser ,  BindingResult result) {
+		pssusUserValidator.validate(USTUser,result);
 		if (result.hasErrors()) {
-			return ResponseEntity.badRequest()
-					.body("{\"success\": false, \"message\": " +
-							result.getFieldError().getRejectedValue() + "}");
+			List<String> errorMessages = result.getFieldErrors().stream()
+					.map(error -> String.format("%s", error.getDefaultMessage()))
+					.collect(Collectors.toList());
+			String errorResponse = String.format("{\"success\": false, \"errors\": [%s]}",
+					errorMessages.stream().map(msg -> "\"" + msg + "\"").collect(Collectors.joining(", ")));
+			return ResponseEntity.badRequest().body(errorResponse);
 		}
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String encodedPassword = passwordEncoder.encode(USTUser.getPassword());
@@ -257,14 +272,14 @@ public class AppController {
 			if(schedule != null) {
 				pitch = pssusBookingMapper.getLCSDSoccerPitchByPitchType(schedule.getFacility_type_name_en()).get(0);
 			} else {
-				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Current Schedule not found \"}");
+				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": \"Current Schedule not found \"}");
 			}
 			USTStudentWalletTransaction transaction = new USTStudentWalletTransaction();
 			if(pitch != null) {
 				double balanceAfter = wallet.getCurrBalance() - Double.parseDouble(pitch.getPrice());
 				wallet.setCurrBalance(balanceAfter);
 				if (balanceAfter < 0) {
-					return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Current Balance of student not fulfilled \"}");
+					return ResponseEntity.badRequest().body("{\"success\": false, \"message\": \"Current Balance of student not fulfilled \"}");
 				} else {
 					pssusBookingMapper.updateWallet(wallet);
 				}
@@ -280,7 +295,7 @@ public class AppController {
 				pssusBookingMapper.insertStudentWalletTransaction(transaction);
 				pssusBookingMapper.updateStsCode(record);
 			} else {
-				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": Pitch cannot find, please check \"}");
+				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": \"Pitch cannot find, please check \"}");
 			}
 		}
 		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Approved successful\"}");

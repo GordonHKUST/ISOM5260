@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface PSSUSUserMapper {
 
@@ -19,5 +21,11 @@ public interface PSSUSUserMapper {
 
     @Select("select * from USTUser where email = #{email}")
     USTUser selectByEmail(String email);
+
+    @Select("select * from USTUser where STUDENTID = #{student_id}")
+    USTUser selectByStudentId(String student_id);
+
+    @Select("select * from USTUser WHERE right = 'STUDENT'")
+    List<USTUser> selectAllStudent();
 
 }

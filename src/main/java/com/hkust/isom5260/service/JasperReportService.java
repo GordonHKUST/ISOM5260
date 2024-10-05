@@ -30,17 +30,13 @@ public class JasperReportService {
             Map<String, Object> parameters = new HashMap<>();
             String reportPath = "";
             switch (criteria.getReportSelect()) {
-                case "report1":
-                    reportPath = "src/main/resources/report1.jrxml";
+                case "REP_001":
+                    reportPath = "src/main/resources/REP_001.jrxml";
                     break;
-                case "report2":
-                    reportPath = "src/main/resources/report2.jrxml";
-                    break;
-                case "report3":
-                    reportPath = "src/main/resources/report3.jrxml";
+                case "REP_002":
+                    reportPath = "src/main/resources/REP_002.jrxml";
                     break;
                 default:
-                    reportPath = "default/path/to/report.jrxml";
                     break;
             }
             parameters.put("startDate", Date.valueOf(criteria.getStartDate()));
@@ -72,7 +68,7 @@ public class JasperReportService {
                 properties.getProperty("spring.datasource.password"));
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("email", email);
-        String reportPath = "src/main/resources/isom5260.jrxml";
+        String reportPath = "src/main/resources/REP_003.jrxml";
         JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, conn);
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);

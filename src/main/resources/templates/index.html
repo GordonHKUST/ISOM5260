@@ -39,6 +39,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="style_index.css" />
+	<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<title>Sign in & Sign up Form</title>
 </head>
 
@@ -97,7 +99,7 @@
 					   	   <input type="text" th:field="*{studyYear}" class="form-control" placeholder="&nbsp;&nbsp;&nbsp;Year" required="true" max="2" />
 					   </div>
 					</div>
-					<p><b>Program</b></p>
+					<p><b>Your Study Program</b></p>
 					<div class="form-group">
 							<select id="program" th:field="*{program}" required="true">
 								<option value="" disabled selected>Select a program</option>
@@ -120,7 +122,7 @@
 					<h3>New here ?</h3>
 					<p>
 						Join HKUST ISOM Club PSSUS , more than 500 soccer pitches which under management of LCSD schedule awaits you for register.
-						3000 Credits will be gained for Member each month.
+						3000 Credits will be gained for Member at the first month. 20 Credits will be gained for member of each day.
 					</p>
 					<button class="btn transparent" id="sign-up-btn">
 						Sign up
@@ -132,7 +134,7 @@
 				<div class="content">
 					<h3>One of us ?</h3>
 					<p>
-						Login and Create/Join Campaign, enjoy the discount for booking LCSD managed soccer pitches now.
+						Login and Create/Join Campaign, enjoy the booking of LCSD Public soccer pitches now.
 					</p>
 					<button class="btn transparent" id="sign-in-btn">
 						Sign in
@@ -153,7 +155,6 @@
 		$('#program').select2();
 		$('#signupForm').on('submit', function(event) {
 			event.preventDefault();
-			$('#sign-in-btn').prop('disabled', true);
 			$.ajax({
 				url: $(this).attr('action'),
 				type: 'POST',
@@ -185,8 +186,12 @@
 					}
 				},
 				error: function(xhr, status, error) {
-					// Handle error
-					alert('Registration failed: ' + xhr.responseText);
+					Swal.fire({
+						title: 'Fail!',
+						text: JSON.parse(xhr.responseText).errors.join(','),
+						icon: 'error',
+						confirmButtonText: 'Return'
+					})
 				}
 			});
 		});

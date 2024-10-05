@@ -37,6 +37,15 @@ public interface PSSUSBookingMapper {
             "WHERE pbr.email = #{email} OR jbr.joiner_email = #{email} ")
     List<PSSUSBookingRecord> getMyPSSUSBookingRecordByEmail(String email);
 
+
+    @Select("SELECT usr.* from PSSUS_Booking_Record pbr " +
+            "JOIN PSSUS_JOIN_BOOKING_RECORD jbr " +
+            "ON pbr.booking_id = jbr.booking_record_id " +
+            "JOIN USTUSER usr " +
+            "ON usr.email = jbr.joiner_email " +
+            "WHERE pbr.booking_Id = #{bookingId} ")
+        List<USTUser> getJoinUserByBookingId(String bookingId);
+
     @Select("SELECT DISTINCT *\n" +
             "FROM PSSUS_Booking_Record pbr\n" +
             "LEFT JOIN PSSUS_JOIN_BOOKING_RECORD jbr ON pbr.booking_id = jbr.booking_record_id\n" +

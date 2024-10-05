@@ -56,8 +56,7 @@ public class SyncLCSDSoccerPitchCronJob {
 
     @Scheduled(cron = "0 */5 * * * ?")
     protected void executeInternal() throws JobExecutionException {
-
-        if(properties.getProperty("sync.job.enabled.backend").equals("false")) {
+        if(properties.getProperty("job.enabled.backend").equals("false")) {
             return;
         }
 
