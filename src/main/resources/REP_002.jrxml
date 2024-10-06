@@ -49,10 +49,6 @@ OR PSSUS_BOOKING_RECORD.STATUS_CODE = 'RECORD_REJECTED'
 AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') >= $P{startDate}
 AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') <= $P{endDate}]]>
     </queryString>
-    <field name="ID" class="java.math.BigDecimal">
-        <property name="com.jaspersoft.studio.field.name" value="ID"/>
-        <property name="com.jaspersoft.studio.field.label" value="ID"/>
-    </field>
     <field name="EMAIL" class="java.lang.String">
         <property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
         <property name="com.jaspersoft.studio.field.label" value="EMAIL"/>

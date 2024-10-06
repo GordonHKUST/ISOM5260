@@ -11,8 +11,8 @@ import java.util.List;
 @Mapper
 public interface PSSUSUserMapper {
 
-    @Insert("insert into USTUser(id, email , password ,firstName , lastName , studentId , phone , studyYear , right , program ) " +
-            "values (uststd_seq.nextval, #{email, jdbcType=VARCHAR}, #{password, jdbcType=VARCHAR}, #{firstName, jdbcType=VARCHAR} , #{lastName, jdbcType=VARCHAR} , #{studentId, jdbcType=VARCHAR}, #{phone, jdbcType=VARCHAR} , #{studyYear, jdbcType=VARCHAR} , #{ right, jdbcType=VARCHAR}  , #{program, jdbcType=VARCHAR})")
+    @Insert("insert into USTUser(email , password ,firstName , lastName , studentId , phone , studyYear , right , program ) " +
+            "values (#{email, jdbcType=VARCHAR}, #{password, jdbcType=VARCHAR}, #{firstName, jdbcType=VARCHAR} , #{lastName, jdbcType=VARCHAR} , #{studentId, jdbcType=VARCHAR}, #{phone, jdbcType=VARCHAR} , #{studyYear, jdbcType=VARCHAR} , #{ right, jdbcType=VARCHAR}  , #{program, jdbcType=VARCHAR})")
     void insert (USTUser usr);
 
     @Insert("INSERT INTO UST_Student_Wallet (wallet_id, email, currBalance, lastMonthBalanceLeft) " +

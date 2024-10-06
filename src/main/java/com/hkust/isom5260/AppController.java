@@ -19,12 +19,10 @@ import com.hkust.isom5260.mapper.LCSDSoccerPitchScheduleMapper;
 import com.hkust.isom5260.mapper.PSSUSBookingMapper;
 import com.hkust.isom5260.mapper.PSSUSUserMapper;
 import com.hkust.isom5260.service.JasperReportService;
-import com.hkust.isom5260.validators.PSSUSActivityRegisterValidator;
 import com.hkust.isom5260.validators.PSSUSUserValidator;
 import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -47,8 +45,6 @@ public class AppController {
 	private LCSDDistrictMapper districtMapper;
     @Autowired
 	private JasperReportService jasperReportService;
-    @Autowired
-	private PSSUSActivityRegisterValidator pssusActivityRegisterValidator;
 	@Autowired
 	private PSSUSBookingMapper pssusBookingMapper;
 	@Autowired
@@ -314,7 +310,6 @@ public class AppController {
 
 	@PostMapping("/actReg")
 	public ResponseEntity<?>  processActivityRegister(@RequestBody PSSUSBookingRecord record, Model model, BindingResult result ,HttpServletResponse response) {
-        pssusActivityRegisterValidator.validate(record,result);
 		if (result.hasErrors()) {
 			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
 		} else {
