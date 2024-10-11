@@ -32,7 +32,7 @@ public class PSSUSUserValidator implements Validator {
                 errors.rejectValue("studentId", null, "This student id is not in 8 digits");
             }
             if(Integer.parseInt(((USTUser) o).getStudyYear()) >= 5 || Integer.parseInt(((USTUser) o).getStudyYear()) < 0) {
-                errors.rejectValue("Year", null, "This study year must be smaller than 5 according to the instruction from ARRO");
+                errors.rejectValue("studyYear", null, "This study year must be smaller than 5 according to the instruction from ARRO");
             }
             USTUser existsUser = pssusUserMapper.selectByEmail(((USTUser) o).getEmail());
             if(existsUser != null) {
