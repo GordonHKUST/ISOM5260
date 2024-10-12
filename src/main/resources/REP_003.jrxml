@@ -268,4 +268,15 @@ EXTRACT(MONTH FROM TO_DATE(UST_STUDENT_WALLET_TRANSACTION.TXN_DATE, 'YYYY-MM-DD 
 			</staticText>
 		</band>
 	</lastPageFooter>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="10" width="200" height="15" uuid="359122bc-07d1-4dfc-8ec8-649ca1d69d0e"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</box>
+				<text><![CDATA[The report has no data ]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>

@@ -338,6 +338,7 @@ public class AppController {
 		else if(StringUtils.equals(ustUser.getRight(),"ADMIN")) {
 			model.addAttribute("right", "ADMIN");
 		}
+		model.addAttribute("email",principal.getName());
 		return "reportPrint";
 	}
 

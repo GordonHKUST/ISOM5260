@@ -36,6 +36,9 @@ public class JasperReportService {
                 case "REP_002":
                     reportPath = "src/main/resources/REP_002.jrxml";
                     break;
+                case "REP_004":
+                    reportPath = "src/main/resources/REP_004.jrxml";
+                    break;
                 default:
                     break;
             }

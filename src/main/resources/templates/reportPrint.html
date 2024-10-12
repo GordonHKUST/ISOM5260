@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DataTable Date Search Example</title>
+  <title>Admin Report Print</title>
   <link rel="stylesheet" href="style.css"/>
   <script src="script.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -97,7 +97,7 @@
     <ul class="logout-mode">
       <li><a href="#">
         <i class="uil uil-user"></i>
-        <span class="link-name" th:text="${user}"></span>
+        <span class="link-name" th:text="${email}"></span>
       </a></li>
       <li>
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -127,6 +127,7 @@
                 <option value="">Choose a Report...</option>
                 <option value="REP_001">Monthly Spending for Program</option>
                 <option value="REP_002">Not Approved Report Record</option>
+                <option value="REP_004">Approved Report Record</option>
               </select>
             </div>
           </div>
@@ -169,6 +170,10 @@
     </div>
   </div>
 </section>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script>
   $(document).ready(function() {
       $('#ajaxLink').on('click', function(event) {
@@ -176,13 +181,41 @@
         const startDate = $('#startDate').val();
         const endDate = $('#endDate').val();
         const program = $('#program').val();
-        const queryString = `?reportSelect=${encodeURIComponent(reportSelect)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&program=${encodeURIComponent(program)}`;
-        const url = '/triggerAdminReport' + queryString;
-        const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-        if (newWindow) {
-          newWindow.opener = null;
+        if (!reportSelect) {
+          Swal.fire({
+            title: 'Fail!',
+            text: 'Please fill in Report need to select',
+            icon: 'error',
+            confirmButtonText: 'Return'
+          })
+        } else if(!startDate) {
+          Swal.fire({
+            title: 'Fail!',
+            text: 'Please fill in Start Date',
+            icon: 'error',
+            confirmButtonText: 'Return'
+          })
+        } else if(!endDate) {
+          Swal.fire({
+            title: 'Fail!',
+            text: 'Please fill in End Date',
+            icon: 'error',
+            confirmButtonText: 'Return'
+          })
+        } else if (!program) {
+          Swal.fire({
+            title: 'Fail!',
+            text: 'Please fill in Program',
+            icon: 'error',
+            confirmButtonText: 'Return'
+          })
         } else {
-          alert('Please allow popups for this site to open the report.');
+          const queryString = `?reportSelect=${encodeURIComponent(reportSelect)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&program=${encodeURIComponent(program)}`;
+          const url = '/triggerAdminReport' + queryString;
+          const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+          if (newWindow) {
+            newWindow.opener = null;
+          }
         }
       });
 });

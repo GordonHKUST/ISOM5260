@@ -44,8 +44,7 @@
 JOIN "SLLIAC"."PSSUS_BOOKING_RECORD"
 ON USTUSER.EMAIL = PSSUS_BOOKING_RECORD.EMAIL
 WHERE USTUSER.program = $P{program}
-AND (PSSUS_BOOKING_RECORD.STATUS_CODE = 'TIME_SLOT_STARTED_AND_NOT_APPROVED'
-OR PSSUS_BOOKING_RECORD.STATUS_CODE = 'RECORD_REJECTED')
+AND PSSUS_BOOKING_RECORD.STATUS_CODE = 'RECORD_APPROVED'
 AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') >= $P{startDate}
 AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') <= $P{endDate}]]>
     </queryString>
@@ -140,7 +139,7 @@ AND TO_DATE(PSSUS_BOOKING_RECORD.RECORD_CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') <= 
             </staticText>
             <staticText>
                 <reportElement style="SubTitle" x="15" y="65" width="310" height="25" uuid="3953a09d-1438-4532-ab9a-0b8a03a0c685"/>
-                <text><![CDATA[Not Approved Records]]></text>
+                <text><![CDATA[Approved Records]]></text>
             </staticText>
             <staticText>
                 <reportElement x="360" y="10" width="55" height="20" uuid="0356c3c5-adda-417a-b8a0-1a941ab3ac34"/>
