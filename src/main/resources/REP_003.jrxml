@@ -130,7 +130,7 @@ EXTRACT(MONTH FROM TO_DATE(UST_STUDENT_WALLET_TRANSACTION.TXN_DATE, 'YYYY-MM-DD 
 		<band height="140" splitType="Stretch">
 			<staticText>
 				<reportElement style="Title" x="15" y="20" width="320" height="45" uuid="82d05c2b-4a32-4ff5-be1b-0f116e4d9ae9"/>
-				<text><![CDATA[HKUST ISOM PSSUS]]></text>
+				<text><![CDATA[ISOM Club PSSUS]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="SubTitle" x="15" y="75" width="310" height="25" uuid="3953a09d-1438-4532-ab9a-0b8a03a0c685"/>
@@ -148,7 +148,7 @@ EXTRACT(MONTH FROM TO_DATE(UST_STUDENT_WALLET_TRANSACTION.TXN_DATE, 'YYYY-MM-DD 
 			<staticText>
 				<reportElement x="360" y="30" width="55" height="20" uuid="e1f20d69-aef6-4c96-9b24-eb8507cef9a4"/>
 				<textElement textAlignment="Right"/>
-				<text><![CDATA[Student:]]></text>
+				<text><![CDATA[Name:]]></text>
 			</staticText>
 			<textField pattern="EEEEE dd MMMMM yyyy">
 				<reportElement x="415" y="30" width="150" height="20" uuid="2bce6621-d64f-47b0-82a8-134b6500606c"/>
@@ -161,7 +161,7 @@ EXTRACT(MONTH FROM TO_DATE(UST_STUDENT_WALLET_TRANSACTION.TXN_DATE, 'YYYY-MM-DD 
 			<staticText>
 				<reportElement x="360" y="50" width="55" height="20" uuid="d6bbf3ed-72f7-41c2-922b-05842d19dcf1"/>
 				<textElement textAlignment="Right"/>
-				<text><![CDATA[Student ID:]]></text>
+				<text><![CDATA[ID:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="415" y="72" width="330" height="30" uuid="67546a22-1e17-4e6e-8042-9a9abbb0e169"/>
