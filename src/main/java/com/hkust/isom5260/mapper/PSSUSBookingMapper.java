@@ -25,8 +25,8 @@ public interface PSSUSBookingMapper {
             "(booking_join_seq.NEXTVAL,#{booking_record_id},#{joiner_student_id},#{joiner_email} , #{record_create_date} )")
     void insertJoinRecord(PSSUSJoinBookingRecord bookingRecord);
 
-    @Update("UPDATE PSSUS_Booking_Record SET status_code = #{status_code, jdbcType=VARCHAR} where booking_Id = #{booking_Id, jdbcType=INTEGER} ")
-    void updateStsCode(PSSUSBookingRecord bookingRecord);
+    @Update("UPDATE PSSUS_Booking_Record SET status_code = #{status_code, jdbcType=VARCHAR}  , reason = #{reason, jdbcType=VARCHAR} where booking_Id = #{booking_Id, jdbcType=INTEGER} ")
+    void adminBookingRecordAction(PSSUSBookingRecord bookingRecord);
 
     @Update("UPDATE UST_STUDENT_WALLET SET currBalance = #{currBalance} where wallet_id = #{wallet_id} ")
     void updateWallet(USTStudentWallet ustStudentWallet);

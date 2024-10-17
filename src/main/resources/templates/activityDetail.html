@@ -331,9 +331,17 @@ p{
                 <p>Venue Phone Number</p>
                 <input type="text" id="Venue Contact Phone" th:value="${schedules.venue_phone_no}" placeholder="Venue Contact Phone" disabled />
             </div>
-
+            <div class="item" th:if="${bookingRecord != null}">
+                <p>Approve/Reject Reason * </p>
+                <div th:if="${student.right == 'ADMIN' && bookingRecord != null}">
+                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason"/>
+                </div>
+                <div th:if="${student.right == 'STUDENT' && bookingRecord != null}">
+                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason" required disabled/>
+                </div>
+            </div>
         <div class="item">
-            <p>Booking Venue</p>
+            <p>Booking Venue (7 people size : 500 points, 12 people size : 1000 points)</p>
             <div class="city-item">
                 <input type="text" id="addrLn2" th:value="${schedules.venue_name_en} + ' (' + ${schedules.venue_name_tc} + ')'" placeholder="Chinese Address" disabled />
                 <input type="text" id="addrLn1" th:value="${schedules.venue_address_en} + ' (' + ${schedules.venue_address_tc} + ')' " placeholder="Address" disabled />
@@ -418,7 +426,8 @@ p{
                 campaign_Remark: $('#campaignRemark').val(),
                 start_Time: $('#startTime').val(),
                 end_Time: $('#endTime').val(),
-                schedule_id: $('#scheduleId').val()
+                schedule_id: $('#scheduleId').val(),
+                reason : $('#reason').val()
             };
 
             if (isFormSubmit) {

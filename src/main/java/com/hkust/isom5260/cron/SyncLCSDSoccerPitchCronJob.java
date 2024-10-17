@@ -178,7 +178,7 @@ public class SyncLCSDSoccerPitchCronJob {
                     } else if(StringUtils.equals(bookingRecord.getStatus_code(),"APPROVED_AND_REGISTERED")) {
                         bookingRecord.setStatus_code("TIME_SLOT_STARTED_AND_APPROVED");
                     }
-                    pssusBookingMapper.updateStsCode(bookingRecord);
+                    pssusBookingMapper.adminBookingRecordAction(bookingRecord);
                     System.out.println("Booking Pitch Schedule ID :" + bookingRecord.getSchedule_id() +
                             " had updated to " + bookingRecord.getStatus_code());
                 }

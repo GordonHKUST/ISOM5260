@@ -24,4 +24,5 @@ public class PSSUSBookingRecord {
     private String last_Name;
     private String first_Name;
     private String record_create_date;
+    private String reason;
 }

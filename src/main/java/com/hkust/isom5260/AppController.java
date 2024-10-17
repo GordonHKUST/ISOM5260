@@ -172,6 +172,9 @@ public class AppController {
 
 	@GetMapping("searchPanel")
 	public String searchPanel(Model model,Principal principal) {
+		if(principal == null) {
+			return "login";
+		}
 		List<LCSDDistrict> lcsdDistricts = districtMapper.selectDistrictFromSchedule();
 		model.addAttribute("districts", lcsdDistricts);
 		USTUser USTUser = pssusUserMapper.selectByEmail(principal.getName());
@@ -289,7 +292,7 @@ public class AppController {
 				transaction.setTxn_date(dateString);
 				transaction.setBooking_id(Integer.parseInt(record.getBooking_Id()));
 				pssusBookingMapper.insertStudentWalletTransaction(transaction);
-				pssusBookingMapper.updateStsCode(record);
+				pssusBookingMapper.adminBookingRecordAction(record);
 			} else {
 				return ResponseEntity.badRequest().body("{\"success\": false, \"message\": \"Pitch cannot find, please check \"}");
 			}
@@ -303,7 +306,7 @@ public class AppController {
 			return ResponseEntity.badRequest().body("{\"success\": false, \"message\": " + result.getFieldError().getRejectedValue() + "}");
 		} else {
 			record.setStatus_code("RECORD_REJECTED");
-			pssusBookingMapper.updateStsCode(record);
+			pssusBookingMapper.adminBookingRecordAction(record);
 		}
 		return ResponseEntity.ok().body("{\"success\": true, \"message\": \"Campaign Rejected successful\"}");
 	}
@@ -331,6 +334,9 @@ public class AppController {
 
 	@GetMapping("/adminReport")
 	public String adminReport(Principal principal,Model model,HttpServletResponse response) throws IOException {
+		if(principal == null) {
+			return "login";
+		}
 		USTUser ustUser = pssusUserMapper.selectByEmail(principal.getName());
 		if(StringUtils.equals(ustUser.getRight(),"STUDENT")) {
 			model.addAttribute("right", "STUDENT");
