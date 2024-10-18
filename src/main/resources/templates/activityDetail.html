@@ -268,10 +268,10 @@ p{
         <div class="item">
             <p>Campaign Detail<span >*</span></p>
             <div th:if="${bookingRecord != null}">
-                <input id="campaignDetail" type="text" name="name" th:value="${bookingRecord.campaign_Detail}" disabled/>
+                <input id="campaignDetail" type="text" name="name" th:value="${bookingRecord.campaign_Detail}"  disabled/>
             </div>
             <div th:if="${bookingRecord == null}">
-                <input id="campaignDetail" type="text" name="name" required/>
+                <input id="campaignDetail" type="text" name="name" maxlength="50" required/>
             </div>
         </div>
         <div class="item">
@@ -280,16 +280,16 @@ p{
                 <input id="campaignRemark" type="text" name="name" th:value="${bookingRecord.campaign_Remark}" disabled/>
             </div>
             <div th:if="${bookingRecord == null}">
-                <input id="campaignRemark" type="text" name="name" required/>
+                <input id="campaignRemark" type="text" name="name" maxlength="50" required/>
             </div>
         </div>
         <div class="item">
             <p>Expected Number of people come *</p>
             <div th:if="${bookingRecord == null}">
-                <input id="joinPerson" type="number" name="name" required/>
+                <input id="joinPerson" type="number" name="name" max="15" required/>
             </div>
             <div th:if="${bookingRecord != null}">
-               <input id="joinPerson" type="number" name="name" th:value="${bookingRecord.join_person}" disabled/>
+               <input id="joinPerson" type="number" name="name"  th:value="${bookingRecord.join_person}" disabled/>
              </div>
         </div>
        <p>Confirm Joiner</p>
@@ -340,10 +340,10 @@ p{
             <div class="item" th:if="${bookingRecord != null}">
                 <p>Approve/Reject Reason * </p>
                 <div th:if="${student.right == 'ADMIN' && bookingRecord != null}">
-                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason"/>
+                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason" maxlength="50" required/>
                 </div>
                 <div th:if="${student.right == 'STUDENT' && bookingRecord != null}">
-                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason" required disabled/>
+                    <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason" disabled/>
                 </div>
             </div>
         <div class="item">
