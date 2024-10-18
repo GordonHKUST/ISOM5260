@@ -131,8 +131,7 @@ public class AppController {
 
 	@GetMapping("getPendingPSSUSBookingRecord")
 	@ResponseBody
-	public List<PSSUSBookingRecord> getPendingPSSUSBookingRecord(Model model, Principal principal) {
-		String email = principal.getName();
+	public List<PSSUSBookingRecord> getPendingPSSUSBookingRecord() {
 		List<PSSUSBookingRecord> schedules = pssusBookingMapper.getPendingPSSUSBookingRecord();
 		return getPssusBookingRecords(schedules);
 	}
