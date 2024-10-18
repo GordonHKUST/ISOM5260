@@ -83,6 +83,8 @@ public class AppController {
 			USTUser host = pssusUserMapper.selectByEmail(bookingRecord.getEmail());
 			bookingRecord.setLast_Name(host.getLastName());
 			bookingRecord.setFirst_Name(host.getFirstName());
+			USTStudentWallet wallet = pssusBookingMapper.getUSTStudentWalletByEmail(host.getEmail()).get(0);
+			model.addAttribute("studentWallet", wallet.getCurrBalance());
 					id = Integer.valueOf(bookingRecord.getSchedule_id());
 			isBooking = true;
 			if(pssusBookingMapper.getCountPSSUSBookingRecordByBookingId(String.valueOf(bookingId),USTUser.getEmail()) > 0) {

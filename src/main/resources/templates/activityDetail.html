@@ -259,6 +259,12 @@ p{
                 <input id="studentId" type="text" name="name" th:value="${student.studentId}" disabled/>
             </div>
         </div>
+        <div th:if="${bookingRecord != null && student.right == 'ADMIN'}">
+        <div class="item">
+                <p>Hoster Point</p>
+                <input id="studentWallet" type="text" name="name" th:value="${studentWallet}" disabled/>
+        </div>
+        </div>
         <div class="item">
             <p>Campaign Detail<span >*</span></p>
             <div th:if="${bookingRecord != null}">
@@ -278,7 +284,7 @@ p{
             </div>
         </div>
         <div class="item">
-            <p>Expected Number of people come</p>
+            <p>Expected Number of people come *</p>
             <div th:if="${bookingRecord == null}">
                 <input id="joinPerson" type="number" name="name" required/>
             </div>
@@ -353,7 +359,7 @@ p{
             </div>
         </div>
         <div class="question">
-            <p>Do you require a trainer? (Sport Consultant from HKUST, free for charge)</p>
+            <p>Do you require a trainer? * (Sport Consultant from HKUST, free for charge)</p>
             <div th:if="${bookingRecord != null}">
             <div class="question-answer">
                 <div th:if="${bookingRecord.personal_trainer == 'Y'}">
