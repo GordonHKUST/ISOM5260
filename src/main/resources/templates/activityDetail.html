@@ -338,7 +338,7 @@ p{
                 <input type="text" id="Venue Contact Phone" th:value="${schedules.venue_phone_no}" placeholder="Venue Contact Phone" disabled />
             </div>
             <div class="item" th:if="${bookingRecord != null}">
-                <p>Approve/Reject Reason * </p>
+                <p>Approve/Reject Reason </p>
                 <div th:if="${student.right == 'ADMIN' && bookingRecord != null}">
                     <input type="text" id="reason" th:value="${bookingRecord.reason}" placeholder="Reason" maxlength="50" required/>
                 </div>
